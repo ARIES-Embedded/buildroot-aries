@@ -1,0 +1,35 @@
+loadaddr=0x01000000
+bootdelay=3
+preboot=run try_bootscript
+bootcmd=run mmc_mmc
+consdev=ttyS0
+baudrate=115200
+bootscript=boot.scr
+bootdev=/dev/mmcblk0p2
+rootdev=/dev/mmcblk0p3
+netdev=eth0
+hostname=mcvevk
+bootfile=zImage
+dtb_file=socfpga_cyclone5_mcvevk.dtb
+kernel_addr_r=0x01000000
+dtb_addr_r=0x00f00000
+dfu_alt_info=mmc raw 0 3867148288
+update_file=uboot.img
+update_mmc_offset=0x800
+update_mmc=if mmc rescan ; then if tftp ${hostname}/${update_file} ; then setexpr fw_sz ${filesize} / 0x200 ; setexpr fw_sz ${fw_sz} + 1 ; mmc write ${loadaddr} ${update_mmc_offset} ${fw_sz} ; fi ; fi
+fpga_file=output_file.rbf
+load_fpga=if tftp ${hostname}/${fpga_file} ; then fpga load 0 $loadaddr $filesize ; bridge enable ; fi
+addcons=setenv bootargs ${bootargs} console=${consdev},${baudrate}
+addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:${netdev}:off
+addmisc=setenv bootargs ${bootargs} ${miscargs}
+addargs=run addcons addmisc
+mmcload=mmc rescan ; load mmc 0:2 ${kernel_addr_r} ${bootfile} ; load mmc 0:2 ${dtb_addr_r} ${dtb_file}
+netload=tftp ${kernel_addr_r} ${hostname}/${bootfile} ; tftp ${dtb_addr_r} ${hostname}/${dtb_file}
+miscargs=nohlt panic=1
+mmcargs=setenv bootargs root=${rootdev} rw rootwait
+nfsargs=setenv bootargs root=/dev/nfs rw nfsroot=${serverip}:${rootpath},v3,tcp
+mmc_mmc=run mmcload mmcargs addargs ; bootz ${kernel_addr_r} - ${dtb_addr_r}
+mmc_nfs=run mmcload nfsargs addip addargs ; bootz ${kernel_addr_r} - ${dtb_addr_r}
+net_mmc=run netload mmcargs addargs ; bootz ${kernel_addr_r} - ${dtb_addr_r}
+net_nfs=run netload nfsargs addip addargs ; bootz ${kernel_addr_r} - ${dtb_addr_r}
+try_bootscript=mmc rescan ; if test -e mmc 0:2 ${bootscript} ; then if load mmc 0:2 ${kernel_addr_r} ${bootscript} ; then ; echo "Running bootscript..." ; source ${kernel_addr_r} ; fi ; fi
