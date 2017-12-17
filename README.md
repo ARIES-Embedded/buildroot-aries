@@ -32,7 +32,7 @@ Then create a build directory for the default configuration:
 
         $ cd $WORK_DIR/buildroot
         $ make BR2_EXTERNAL=$WORK_DIR/buildroot-aries \
-            O=$WORK_DIR/mcvevk aries_mcvevk_defconfig
+            O=$WORK_DIR/mcvevk mcvevk_defconfig
 
 And finally make the BSP for the MCVEVP:
 
