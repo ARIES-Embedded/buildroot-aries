@@ -7,6 +7,7 @@ buildroot tree][2] to maintain the ARIES Embedded specific parts.
 The following EVKs are supported:
 
  * MCVEVK and [MCVEVP][3]
+ * [MA5D4EVK][4]
 
 You can build an embedded Linux distribution with Buildroot as shown
 below. The example is for the MCVEVP. For other EVKs just substitue the
@@ -54,3 +55,4 @@ once after copying the SDK to the new location:
 [1]: https://buildroot.org
 [2]: https://buildroot.org/downloads/manual/manual.html#outside-br-custom
 [3]: board/mcvevk/readme.txt
+[4]: board/ma5d4evk/readme.txt

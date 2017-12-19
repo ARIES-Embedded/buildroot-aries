@@ -1,0 +1,38 @@
+addargs=run addcons addmisc
+addcons=setenv bootargs ${bootargs} console=${consdev},${baudrate}
+addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:${netdev}:off
+addmisc=setenv bootargs ${bootargs} ${miscargs}
+baudrate=115200
+bootcmd=run mmc_mmc
+bootdelay=3
+bootdev=/dev/mmcblk0p1
+bootfile=zImage
+bootpart=0:1
+bootscript=boot.scr
+consdev=ttyS3
+dfu_alt_info=mmc raw 0 3867148288
+fdt_addr_r=0x21f00000
+fdt_mmc_file=at91-sama5d4_ma5d4emmcevk.dtb
+fdt_sf_file=at91-sama5d4_ma5d4sfevk.dtb
+fdtimg=if test ${bootmode} = "sf" ; then setenv fdt_file ${fdt_sf_file} ; else ; setenv fdt_file ${fdt_mmc_file} ; fi
+hostname=ma5d4evk
+kernel_addr_r=0x22000000
+loadaddr=0x20800000
+miscargs=nohlt panic=1
+mmc_mmc=run fdtimg mmcload mmcargs addargs ; bootz ${kernel_addr_r} - ${fdt_addr_r}
+mmc_nfs=run fdtimg mmcload nfsargs addip addargs ; bootz ${kernel_addr_r} - ${fdt_addr_r}
+mmcargs=setenv bootargs root=${rootdev} rw rootwait
+mmcload=mmc rescan ; load mmc ${bootpart} ${kernel_addr_r} ${bootfile} ; load mmc ${bootpart} ${fdt_addr_r} ${fdt_file}
+net_mmc=run fdtimg netload mmcargs addargs ; bootz ${kernel_addr_r} - ${fdt_addr_r}
+net_nfs=run fdtimg netload nfsargs addip addargs ; bootz ${kernel_addr_r} - ${fdt_addr_r}
+netdev=eth0
+netload=tftp ${kernel_addr_r} ${hostname}/${bootfile} ; tftp ${fdt_addr_r} ${hostname}/${fdt_file}
+nfsargs=setenv bootargs root=/dev/nfs rw nfsroot=${serverip}:${rootpath},v3,tcp
+preboot=run try_bootscript
+rootdev=/dev/mmcblk1p2
+try_bootscript=mmc rescan;if test -e mmc 1:1 ${bootscript} ; then if load mmc 1:1 ${kernel_addr_r} ${bootscript};then ; echo Running bootscript... ; source ${kernel_addr_r} ; fi ; fi
+update_spi_fw=if sf probe ; then if tftp ${update_spi_fw_spl_addr} ${update_spi_fw_spl_file} ; then setenv update_spi_fw_spl_filesize ${filesize} ; if tftp ${update_spi_fw_addr} ${update_spi_fw_file} ; then setenv update_spi_fw_filesize ${filesize} ; sf update ${update_spi_fw_spl_addr} 0x0 ${update_spi_fw_spl_filesize} ; sf update ${update_spi_fw_addr} 0x10000 ${update_spi_fw_filesize} ; fi ; fi ; fi
+update_spi_fw_addr=0x22000000
+update_spi_fw_file=u-boot.img
+update_spi_fw_spl_addr=0x21000000
+update_spi_fw_spl_file=boot.bin
