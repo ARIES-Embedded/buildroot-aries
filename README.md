@@ -54,5 +54,5 @@ once after copying the SDK to the new location:
 
 [1]: https://buildroot.org
 [2]: https://buildroot.org/downloads/manual/manual.html#outside-br-custom
-[3]: board/mcvevk/readme.txt
+[3]: board/mcvevk/readme.md
 [4]: board/ma5d4evk/readme.txt

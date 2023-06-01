@@ -12,7 +12,8 @@ hostname=mcvevk
 bootfile=zImage
 dtb_file=socfpga_cyclone5_mcvevk.dtb
 kernel_addr_r=0x01000000
-dtb_addr_r=0x00f00000
+socfpga_legacy_reset_compat=1
+dtb_addr_r=00f00000
 dfu_alt_info=mmc raw 0 3867148288
 update_file=uboot.img
 update_mmc_offset=0x800
@@ -29,6 +30,7 @@ miscargs=nohlt panic=1
 mmcargs=setenv bootargs root=${rootdev} rw rootwait
 nfsargs=setenv bootargs root=/dev/nfs rw nfsroot=${serverip}:${rootpath},v3,tcp
 mmc_mmc=run mmcload mmcargs addargs ; bootz ${kernel_addr_r} - ${dtb_addr_r}
+mmc_mmc_fb=run load_fpga mmcload mmcargs addargs ; mw.l 0xffc25080 0x00003fff ; bootz ${kernel_addr_r} - ${dtb_addr_r}
 mmc_nfs=run mmcload nfsargs addip addargs ; bootz ${kernel_addr_r} - ${dtb_addr_r}
 net_mmc=run netload mmcargs addargs ; bootz ${kernel_addr_r} - ${dtb_addr_r}
 net_nfs=run netload nfsargs addip addargs ; bootz ${kernel_addr_r} - ${dtb_addr_r}
