@@ -21,13 +21,13 @@ official buildroot repository:
 
         $ git clone https://github.com/ARIES-Embedded/buildroot-aries.git
 
-        $ git clone --branch 2017.11.x git://git.buildroot.net/buildroot.git
+        $ git clone --branch 2023.02.x git://git.buildroot.net/buildroot.git
 
-If the maintenance branch `2017.11.x` is not yet available, please use:
+If the maintenance branch `2023.02.x` is not yet available, please use:
 
         $ git clone git://git.buildroot.net/buildroot.git
         $ cd buildroot
-        $ git checkout -b aries-2017.11 2017.11
+        $ git checkout -b aries-2023.02 2023.02
 
 Then create a build directory for the default configuration:
 
