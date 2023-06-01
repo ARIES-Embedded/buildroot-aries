@@ -1,0 +1,61 @@
+From b94f07bf184ea90c86ab832cceeb0107850b4331 Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@grandegger.com>
+Date: Thu, 18 May 2023 12:20:12 +0200
+Subject: [PATCH 2/2] boot/arm-trusted-firmware: add option to include
+ u-boot.dtb into FIP image
+
+Recent versions include u-boot-nodtb.bin and u-boot.dtb into the FIP image.
+We add an option to specify the file used for the BL33_CFG argument. If
+this option is an empty sting, it will be ignored for backward compatibility.
+
+Signed-off-by: Wolfgang Grandegger <wg@grandegger.com>
+---
+ boot/arm-trusted-firmware/Config.in               | 8 +++++++-
+ boot/arm-trusted-firmware/arm-trusted-firmware.mk | 8 +++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/boot/arm-trusted-firmware/Config.in b/boot/arm-trusted-firmware/Config.in
+index a9b9bbcc5a..dd3ef6f913 100644
+--- a/boot/arm-trusted-firmware/Config.in
++++ b/boot/arm-trusted-firmware/Config.in
+@@ -142,11 +142,17 @@ if BR2_TARGET_ARM_TRUSTED_FIRMWARE_UBOOT_AS_BL33
+ 
+ config BR2_TARGET_ARM_TRUSTED_FIRMWARE_UBOOT_BL33_IMAGE
+ 	string "U-Boot BL33 image name"
+-	default "u-boot.bin"
++	default "u-boot-nodtb.bin"
+ 	help
+ 	  Name of the U-Boot BL33 image to include in ATF, it must
+ 	  have been installed to BINARIES_DIR by the U-Boot package.
+ 
++config BR2_TARGET_ARM_TRUSTED_FIRMWARE_UBOOT_BL33_CFG_IMAGE
++	string "U-Boot BL33 CFG image name"
++	default "u-boot.dtb"
++	help
++	  Name of the U-Boot BL33 CFG image to include in ATF, it must
++	  have been installed to BINARIES_DIR by the U-Boot package.
+ endif
+ 
+ config BR2_TARGET_ARM_TRUSTED_FIRMWARE_EDK2_AS_BL33
+diff --git a/boot/arm-trusted-firmware/arm-trusted-firmware.mk b/boot/arm-trusted-firmware/arm-trusted-firmware.mk
+index 1164c81410..255126da10 100644
+--- a/boot/arm-trusted-firmware/arm-trusted-firmware.mk
++++ b/boot/arm-trusted-firmware/arm-trusted-firmware.mk
+@@ -116,7 +116,13 @@ endif
+ 
+ ifeq ($(BR2_TARGET_ARM_TRUSTED_FIRMWARE_UBOOT_AS_BL33),y)
+ ARM_TRUSTED_FIRMWARE_UBOOT_BIN = $(call qstrip,$(BR2_TARGET_ARM_TRUSTED_FIRMWARE_UBOOT_BL33_IMAGE))
+-ARM_TRUSTED_FIRMWARE_MAKE_OPTS += BL33=$(BINARIES_DIR)/$(ARM_TRUSTED_FIRMWARE_UBOOT_BIN)
++ifneq ($(BR2_TARGET_ARM_TRUSTED_FIRMWARE_UBOOT_BL33_CFG_IMAGE),"")
++ARM_TRUSTED_FIRMWARE_UBOOT_CFG_OPT = \
++	BL33_CFG=$(BINARIES_DIR)/$(call qstrip,$(BR2_TARGET_ARM_TRUSTED_FIRMWARE_UBOOT_BL33_CFG_IMAGE))
++endif
++ARM_TRUSTED_FIRMWARE_MAKE_OPTS += \
++	BL33=$(BINARIES_DIR)/$(ARM_TRUSTED_FIRMWARE_UBOOT_BIN) \
++	$(ARM_TRUSTED_FIRMWARE_UBOOT_CFG_OPT)
+ ARM_TRUSTED_FIRMWARE_DEPENDENCIES += uboot
+ endif
+ 
+-- 
+2.34.1
+

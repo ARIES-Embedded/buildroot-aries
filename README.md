@@ -8,10 +8,11 @@ The following EVKs are supported:
 
  * MCVEVK and [MCVEVP][3]
  * [MA5D4EVK][4]
+ * [MSMP1EVK][5]
 
 You can build an embedded Linux distribution with Buildroot as shown
 below. The example is for the MCVEVP. For other EVKs just substitue the
-machine name `mcvevk` with the name of your EVK:
+board name `mcvevk` with the name of your EVK, `ma5d4evk` or `msmp1evk`.
 
         $ cd <work-dir>
         $ export WORK_DIR=`pwd`
@@ -28,6 +29,11 @@ If the maintenance branch `2023.02.x` is not yet available, please use:
         $ git clone git://git.buildroot.net/buildroot.git
         $ cd buildroot
         $ git checkout -b aries-2023.02 2023.02
+
+For the MSMP1EVK, you also need to apply some temporary patches for theARM Trusted Firmware and U-Boot boot loader:
+
+        $ cd $WORK_DIR/buildroot
+        $ git am $WORK_DIR/buildroot-aries/board/msmp1evk/buildroot-patches/*.patch
 
 Then create a build directory for the default configuration:
 
@@ -56,3 +62,4 @@ once after copying the SDK to the new location:
 [2]: https://buildroot.org/downloads/manual/manual.html#outside-br-custom
 [3]: board/mcvevk/readme.md
 [4]: board/ma5d4evk/readme.txt
+[5]: board/msmp1evk/readme.md

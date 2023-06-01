@@ -1,0 +1,919 @@
+From 08fe17e8d789ed9940d0d5f0a70187536234ff9e Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@aries-embedded.de>
+Date: Sat, 6 May 2023 10:53:23 +0200
+Subject: [PATCH 3/3] ARM: dts: stm32: introduce Aries Embedded MSMP1 Module on
+ MSMP1EVK
+
+Add support for the ARIES Embedded System on Module (SoM) MSMP1 on
+the Evaluation Kit (EVK) MSMP1EVK.
+
+The following devices are supported
+
+  - LPDDR3 1 GB
+  - eMMC 4 GB
+  - microSD card
+  - UART
+  - Ethernet
+  - USB OTG
+
+Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
+---
+ arch/arm/dts/Makefile                         |   1 +
+ arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi | 234 +++++++++
+ arch/arm/dts/stm32mp157a-msmp1evk.dts         | 449 ++++++++++++++++++
+ configs/stm32mp157a-msmp1evk_defconfig        | 174 +++++++
+ 4 files changed, 858 insertions(+)
+ create mode 100644 arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi
+ create mode 100644 arch/arm/dts/stm32mp157a-msmp1evk.dts
+ create mode 100644 configs/stm32mp157a-msmp1evk_defconfig
+
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index c160e884bf..8324cdd221 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -1238,6 +1238,7 @@ dtb-$(CONFIG_STM32MP15x) += \
+ 	stm32mp157a-icore-stm32mp1-edimm2.2.dtb \
+ 	stm32mp157a-microgea-stm32mp1-microdev2.0.dtb \
+ 	stm32mp157a-microgea-stm32mp1-microdev2.0-of7.dtb \
++	stm32mp157a-msmp1evk.dtb \
+ 	stm32mp157c-dk2.dtb \
+ 	stm32mp157c-dk2-scmi.dtb \
+ 	stm32mp157c-ed1.dtb \
+diff --git a/arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi b/arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi
+new file mode 100644
+index 0000000000..2b517c8ce9
+--- /dev/null
++++ b/arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi
+@@ -0,0 +1,234 @@
++// SPDX-License-Identifier: GPL-2.0+ OR BSD-3-Clause
++/*
++ * Copyright : STMicroelectronics 2018
++ */
++
++#include <dt-bindings/clock/stm32mp1-clksrc.h>
++#include "stm32mp15-u-boot.dtsi"
++#include "stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi"
++
++/ {
++	aliases {
++		i2c3 = &i2c4;
++	};
++
++	config {
++		u-boot,boot-led = "heartbeat";
++		u-boot,error-led = "error";
++		u-boot,mmc-env-partition = "fip";
++		//st,fastboot-gpios = <&gpioa 13 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
++		//st,stm32prog-gpios = <&gpioa 14 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
++	};
++
++#if defined(CONFIG_STM32MP15x_STM32IMAGE) || defined(CONFIG_SPL)
++	config {
++		u-boot,mmc-env-partition = "ssbl";
++	};
++#endif
++
++#ifdef CONFIG_STM32MP15x_STM32IMAGE
++	/* only needed for boot with TF-A, witout FIP support */
++	firmware {
++		optee {
++			compatible = "linaro,optee-tz";
++			method = "smc";
++		};
++	};
++
++	reserved-memory {
++		optee@fe000000 {
++			reg = <0xfe000000 0x02000000>;
++			no-map;
++		};
++	};
++#endif
++
++	led {
++		compatible = "gpio-leds";
++
++		led-green {
++			label = "heartbeat";
++			gpios = <&gpioa 13 GPIO_ACTIVE_LOW>;
++			linux,default-trigger = "heartbeat";
++         		default-state = "off";
++ 		};
++
++		led-red {
++			label = "error";
++			gpios = <&gpioa 14 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++	};
++};
++
++&clk_hse {
++	st,digbypass;
++};
++
++&i2c4 {
++	u-boot,dm-pre-reloc;
++};
++
++&i2c4_pins_a {
++	u-boot,dm-pre-reloc;
++	pins {
++		u-boot,dm-pre-reloc;
++	};
++};
++
++&pmic {
++	u-boot,dm-pre-reloc;
++};
++
++&rcc {
++	st,clksrc = <
++		CLK_MPU_PLL1P
++		CLK_AXI_PLL2P
++		CLK_MCU_PLL3P
++		CLK_PLL12_HSE
++		CLK_PLL3_HSE
++		CLK_PLL4_HSE
++		CLK_RTC_LSE
++		CLK_MCO1_DISABLED
++		CLK_MCO2_DISABLED
++	>;
++
++	st,clkdiv = <
++		1 /*MPU*/
++		0 /*AXI*/
++		0 /*MCU*/
++		1 /*APB1*/
++		1 /*APB2*/
++		1 /*APB3*/
++		1 /*APB4*/
++		2 /*APB5*/
++		23 /*RTC*/
++		0 /*MCO1*/
++		0 /*MCO2*/
++	>;
++
++	st,pkcs = <
++		CLK_CKPER_HSE
++		CLK_FMC_ACLK
++		CLK_QSPI_ACLK
++		CLK_ETH_DISABLED
++		CLK_SDMMC12_PLL4P
++		CLK_DSI_DSIPLL
++		CLK_STGEN_HSE
++		CLK_USBPHY_HSE
++		CLK_SPI2S1_PLL3Q
++		CLK_SPI2S23_PLL3Q
++		CLK_SPI45_HSI
++		CLK_SPI6_HSI
++		CLK_I2C46_HSI
++		CLK_SDMMC3_PLL4P
++		CLK_USBO_USBPHY
++		CLK_ADC_CKPER
++		CLK_CEC_LSE
++		CLK_I2C12_HSI
++		CLK_I2C35_HSI
++		CLK_UART1_HSI
++		CLK_UART24_HSI
++		CLK_UART35_HSI
++		CLK_UART6_HSI
++		CLK_UART78_HSI
++		CLK_SPDIF_PLL4P
++		CLK_FDCAN_PLL4R
++		CLK_SAI1_PLL3Q
++		CLK_SAI2_PLL3Q
++		CLK_SAI3_PLL3Q
++		CLK_SAI4_PLL3Q
++		CLK_RNG1_LSI
++		CLK_RNG2_LSI
++		CLK_LPTIM1_PCLK1
++		CLK_LPTIM23_PCLK3
++		CLK_LPTIM45_LSE
++	>;
++
++	/* VCO = 1066.0 MHz => P = 266 (AXI), Q = 533 (GPU), R = 533 (DDR) */
++	pll2: st,pll@1 {
++		compatible = "st,stm32mp1-pll";
++		reg = <1>;
++		cfg = < 2 65 1 0 0 PQR(1,1,1) >;
++		frac = < 0x1400 >;
++		u-boot,dm-pre-reloc;
++	};
++
++	/* VCO = 417.8 MHz => P = 209, Q = 24, R = 11 */
++	pll3: st,pll@2 {
++		compatible = "st,stm32mp1-pll";
++		reg = <2>;
++		cfg = < 1 33 1 16 36 PQR(1,1,1) >;
++		frac = < 0x1a04 >;
++		u-boot,dm-pre-reloc;
++	};
++
++	/* VCO = 594.0 MHz => P = 99, Q = 74, R = 74 */
++	pll4: st,pll@3 {
++		compatible = "st,stm32mp1-pll";
++		reg = <3>;
++		cfg = < 3 98 5 7 7 PQR(1,1,1) >;
++		u-boot,dm-pre-reloc;
++	};
++};
++
++&sdmmc1 {
++	u-boot,dm-spl;
++};
++
++&sdmmc1_b4_pins_a {
++	u-boot,dm-spl;
++	pins1 {
++		u-boot,dm-spl;
++	};
++	pins2 {
++		u-boot,dm-spl;
++	};
++};
++
++&sdmmc1_dir_pins_a {
++	u-boot,dm-spl;
++	pins1 {
++		u-boot,dm-spl;
++	};
++	pins2 {
++		u-boot,dm-spl;
++	};
++};
++
++&sdmmc2 {
++	u-boot,dm-spl;
++};
++
++&sdmmc2_b4_pins_a {
++	u-boot,dm-spl;
++	pins1 {
++		u-boot,dm-spl;
++	};
++	pins2 {
++		u-boot,dm-spl;
++	};
++};
++
++&sdmmc2_d47_pins_a {
++	u-boot,dm-spl;
++	pins {
++		u-boot,dm-spl;
++	};
++};
++
++&uart4 {
++	u-boot,dm-pre-reloc;
++};
++
++&uart4_pins_a {
++	u-boot,dm-pre-reloc;
++	pins1 {
++		u-boot,dm-pre-reloc;
++	};
++	pins2 {
++		u-boot,dm-pre-reloc;
++		/* pull-up on rx to avoid floating level */
++		bias-pull-up;
++	};
++};
+diff --git a/arch/arm/dts/stm32mp157a-msmp1evk.dts b/arch/arm/dts/stm32mp157a-msmp1evk.dts
+new file mode 100644
+index 0000000000..8ad2449067
+--- /dev/null
++++ b/arch/arm/dts/stm32mp157a-msmp1evk.dts
+@@ -0,0 +1,449 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) STMicroelectronics 2017 - All Rights Reserved
++ * Author: Ludovic Barre <ludovic.barre@st.com> for STMicroelectronics.
++ */
++/dts-v1/;
++
++#include "stm32mp157.dtsi"
++//#include "stm32mp15xc.dtsi"
++#include "stm32mp15-pinctrl.dtsi"
++#include "stm32mp15xxaa-pinctrl.dtsi"
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/mfd/st,stpmic1.h>
++
++/ {
++	model = "ARIES Embedded STM32MP157a MSMP1 module on EVK";
++	compatible = "st,stm32mp157a-msmp1evk", "st,stm32mp157";
++
++	chosen {
++		stdout-path = "serial0:115200n8";
++	};
++
++	memory@c0000000 {
++		device_type = "memory";
++		reg = <0xC0000000 0x40000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		mcuram2: mcuram2@10000000 {
++			compatible = "shared-dma-pool";
++			reg = <0x10000000 0x40000>;
++			no-map;
++		};
++
++		vdev0vring0: vdev0vring0@10040000 {
++			compatible = "shared-dma-pool";
++			reg = <0x10040000 0x1000>;
++			no-map;
++		};
++
++		vdev0vring1: vdev0vring1@10041000 {
++			compatible = "shared-dma-pool";
++			reg = <0x10041000 0x1000>;
++			no-map;
++		};
++
++		vdev0buffer: vdev0buffer@10042000 {
++			compatible = "shared-dma-pool";
++			reg = <0x10042000 0x4000>;
++			no-map;
++		};
++
++		mcuram: mcuram@30000000 {
++			compatible = "shared-dma-pool";
++			reg = <0x30000000 0x40000>;
++			no-map;
++		};
++
++		retram: retram@38000000 {
++			compatible = "shared-dma-pool";
++			reg = <0x38000000 0x10000>;
++			no-map;
++		};
++
++		gpu_reserved: gpu@e8000000 {
++			reg = <0xe8000000 0x8000000>;
++			no-map;
++		};
++	};
++
++	aliases {
++		serial0 = &uart4;
++		ethernet0 = &ethernet0;
++		mmc0 = &sdmmc1;
++		mmc1 = &sdmmc2;
++	};
++
++	vin: vin {
++		compatible = "regulator-fixed";
++		regulator-name = "vin";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		regulator-always-on;
++	};
++};
++
++&adc {
++	/* ANA0, ANA1 are dedicated pins and don't need pinctrl: only in6. */
++	pinctrl-0 = <&adc1_in6_pins_a>;
++	pinctrl-names = "default";
++	vdd-supply = <&vdd>;
++	vdda-supply = <&vdda>;
++	vref-supply = <&vdda>;
++	status = "disabled";
++	adc1: adc@0 {
++		st,adc-channels = <0 1 6>;
++		/* 16.5 ck_cycles sampling time */
++		st,min-sample-time-nsecs = <400>;
++		status = "okay";
++	};
++};
++
++&cpu0 {
++	cpu-supply = <&vddcore>;
++};
++
++&cpu1 {
++	cpu-supply = <&vddcore>;
++};
++
++&crc1 {
++	status = "okay";
++};
++
++&dac {
++	pinctrl-names = "default";
++	pinctrl-0 = <&dac_ch1_pins_a &dac_ch2_pins_a>;
++	vref-supply = <&vdda>;
++	status = "disabled";
++	dac1: dac@1 {
++		status = "okay";
++	};
++	dac2: dac@2 {
++		status = "okay";
++	};
++};
++
++&dts {
++	status = "okay";
++};
++
++&ethernet0 {
++	status = "okay";
++	pinctrl-0 = <&ethernet0_rmii_pins_c>;
++	pinctrl-1 = <&ethernet0_rmii_sleep_pins_c>;
++	pinctrl-names = "default", "sleep";
++	phy-mode = "rmii";
++	max-speed = <100>;
++	phy-handle = <&phy0>;
++
++	mdio0 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		compatible = "snps,dwmac-mdio";
++
++		phy0: ethernet-phy@0 {
++			reg = <0>;
++		};
++	};
++};
++
++
++&gpu {
++	contiguous-area = <&gpu_reserved>;
++};
++
++&hash1 {
++	status = "okay";
++};
++
++&i2c4 {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&i2c4_pins_a>;
++	pinctrl-1 = <&i2c4_sleep_pins_a>;
++	i2c-scl-rising-time-ns = <185>;
++	i2c-scl-falling-time-ns = <20>;
++	clock-frequency = <400000>;
++	status = "okay";
++	/* spare dmas for other usage */
++	/delete-property/dmas;
++	/delete-property/dma-names;
++
++	pmic: stpmic@33 {
++		compatible = "st,stpmic1";
++		reg = <0x33>;
++		interrupts-extended = <&gpioa 0 IRQ_TYPE_EDGE_FALLING>;
++		interrupt-controller;
++		#interrupt-cells = <2>;
++		status = "okay";
++
++		regulators {
++			compatible = "st,stpmic1-regulators";
++			buck1-supply = <&vin>;
++			buck2-supply = <&vin>;
++			buck3-supply = <&vin>;
++			buck4-supply = <&vin>;
++			ldo1-supply = <&v3v3>;
++			ldo2-supply = <&v3v3>;
++			ldo3-supply = <&v3v3>;
++			ldo5-supply = <&vin>;
++			ldo6-supply = <&vin>;
++			vref_ddr-supply = <&vin>;
++			boost-supply = <&vin>;
++			pwr_sw1-supply = <&bst_out>;
++			pwr_sw2-supply = <&bst_out>;
++
++			vddcore: buck1 {
++				regulator-name = "vddcore";
++				regulator-min-microvolt = <1200000>;
++				regulator-max-microvolt = <1250000>;
++				regulator-always-on;
++				regulator-initial-mode = <0>;
++				regulator-over-current-protection;
++			};
++
++			vdd_ddr: buck2 {
++				regulator-name = "vdd_ddr";
++				regulator-min-microvolt = <1200000>;
++				regulator-max-microvolt = <1200000>;
++				regulator-always-on;
++				regulator-initial-mode = <0>;
++				regulator-over-current-protection;
++			};
++
++			vdd: buck3 {
++				regulator-name = "vdd";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-always-on;
++				st,mask-reset;
++				regulator-initial-mode = <0>;
++				regulator-over-current-protection;
++			};
++
++			v3v3: buck4 {
++				regulator-name = "v3v3";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-always-on;
++				regulator-over-current-protection;
++				regulator-initial-mode = <0>;
++			};
++
++			vflash: ldo1 {
++				regulator-name = "vflash";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				interrupts = <IT_CURLIM_LDO1 0>;
++			};
++
++			vdda: ldo2 {
++				regulator-name = "vdda";
++				regulator-min-microvolt = <2900000>;
++				regulator-max-microvolt = <2900000>;
++				interrupts = <IT_CURLIM_LDO2 0>;
++			};
++
++			vdd1_lpddr: ldo3 {
++				regulator-name = "vdd1_lpddr";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-always-on;
++				regulator-over-current-protection;
++			};
++
++			vdd_usb: ldo4 {
++				regulator-name = "vdd_usb";
++				interrupts = <IT_CURLIM_LDO4 0>;
++				regulator-always-on;
++			};
++
++			vdd_sd: ldo5 {
++				regulator-name = "vdd_sd";
++				regulator-min-microvolt = <2900000>;
++				regulator-max-microvolt = <2900000>;
++				interrupts = <IT_CURLIM_LDO5 0>;
++				regulator-boot-on;
++			};
++
++			v1v8: ldo6 {
++				regulator-name = "v1v8";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				interrupts = <IT_CURLIM_LDO6 0>;
++			};
++
++			vref_ddr: vref_ddr {
++				regulator-name = "vref_ddr";
++				regulator-always-on;
++			};
++
++			bst_out: boost {
++				regulator-name = "bst_out";
++				interrupts = <IT_OCP_BOOST 0>;
++			};
++
++			vbus_otg: pwr_sw1 {
++				regulator-name = "vbus_otg";
++				interrupts = <IT_OCP_OTG 0>;
++			 };
++
++			 vbus_sw: pwr_sw2 {
++				regulator-name = "vbus_sw";
++				interrupts = <IT_OCP_SWOUT 0>;
++				regulator-active-discharge = <1>;
++			 };
++		};
++
++		onkey {
++			compatible = "st,stpmic1-onkey";
++			interrupts = <IT_PONKEY_F 0>, <IT_PONKEY_R 0>;
++			interrupt-names = "onkey-falling", "onkey-rising";
++			power-off-time-sec = <10>;
++			status = "okay";
++		};
++
++		watchdog {
++			compatible = "st,stpmic1-wdt";
++			status = "disabled";
++		};
++	};
++};
++
++&ipcc {
++	status = "okay";
++};
++
++&iwdg2 {
++	timeout-sec = <32>;
++	status = "okay";
++};
++
++//&m_can1 {
++//	pinctrl-names = "default", "sleep";
++//	pinctrl-0 = <&m_can1_pins_c>;
++//	pinctrl-1 = <&m_can1_sleep_pins_c>;
++//	status = "okay";
++//};
++
++//&m_can2 {
++//	pinctrl-names = "default", "sleep";
++//	pinctrl-0 = <&m_can2_pins_b>;
++//	pinctrl-1 = <&m_can2_sleep_pins_b>;
++//	status = "okay";
++//};
++
++&m4_rproc {
++	memory-region = <&retram>, <&mcuram>, <&mcuram2>, <&vdev0vring0>,
++			<&vdev0vring1>, <&vdev0buffer>;
++	mboxes = <&ipcc 0>, <&ipcc 1>, <&ipcc 2>;
++	mbox-names = "vq0", "vq1", "shutdown";
++	interrupt-parent = <&exti>;
++	interrupts = <68 1>;
++	status = "okay";
++};
++
++&pwr_regulators {
++	vdd-supply = <&vdd>;
++	vdd_3v3_usbfs-supply = <&vdd_usb>;
++};
++
++&qspi {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&qspi_clk_pins_a &qspi_bk1_pins_a &qspi_cs1_pins_a>;
++	pinctrl-1 = <&qspi_clk_sleep_pins_a &qspi_bk1_sleep_pins_a &qspi_cs1_sleep_pins_a>;
++	reg = <0x58003000 0x1000>, <0x70000000 0x4000000>;
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	flash0: flash@0 {
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-rx-bus-width = <4>;
++		spi-max-frequency = <108000000>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++	};
++};
++
++&rng1 {
++	status = "okay";
++};
++
++&rtc {
++	status = "okay";
++};
++
++&sdmmc1 {
++	pinctrl-names = "default", "opendrain", "sleep";
++	pinctrl-0 = <&sdmmc1_b4_pins_a>;
++	pinctrl-1 = <&sdmmc1_b4_od_pins_a>;
++	pinctrl-2 = <&sdmmc1_b4_sleep_pins_a>;
++	cd-gpios = <&gpiog 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
++	broken-cd;
++	disable-wp;
++	st,neg-edge;
++	bus-width = <4>;
++	vmmc-supply = <&v3v3>;
++	status = "okay";
++};
++
++&sdmmc2 {
++	pinctrl-names = "default", "opendrain", "sleep";
++	pinctrl-0 = <&sdmmc2_b4_pins_a &sdmmc2_d47_pins_e>;
++	pinctrl-1 = <&sdmmc2_b4_od_pins_a &sdmmc2_d47_pins_e>;
++	pinctrl-2 = <&sdmmc2_b4_sleep_pins_a &sdmmc2_d47_sleep_pins_e>;
++	non-removable;
++	no-sd;
++	no-sdio;
++	st,neg-edge;
++	bus-width = <8>;
++	vmmc-supply = <&v3v3>;
++	no-1-8-v;
++	status = "okay";
++};
++
++&timers6 {
++	status = "okay";
++	/* spare dmas for other usage */
++	/delete-property/dmas;
++	/delete-property/dma-names;
++	timer@5 {
++		status = "okay";
++	};
++};
++
++&uart4 {
++	pinctrl-names = "default", "sleep", "idle";
++	pinctrl-0 = <&uart4_pins_a>;
++	pinctrl-1 = <&uart4_sleep_pins_a>;
++	pinctrl-2 = <&uart4_idle_pins_a>;
++	status = "okay";
++};
++
++&usbotg_hs {
++	pinctrl-0 = <&usbotg_hs_pins_a>;
++	pinctrl-names = "default";
++	phy-names = "usb2-phy";
++	phys = <&usbphyc_port1 0>;
++	status = "okay";
++	vbus-supply = <&vbus_otg>;
++};
++
++&usbphyc {
++        status = "okay";
++};
++
++&usbphyc_port0 {
++	phy-supply = <&vdd_usb>;
++};
++
++&usbphyc_port1 {
++	phy-supply = <&vdd_usb>;
++};
+diff --git a/configs/stm32mp157a-msmp1evk_defconfig b/configs/stm32mp157a-msmp1evk_defconfig
+new file mode 100644
+index 0000000000..33eb36a03c
+--- /dev/null
++++ b/configs/stm32mp157a-msmp1evk_defconfig
+@@ -0,0 +1,174 @@
++CONFIG_ARM=y
++CONFIG_ARCH_STM32MP=y
++CONFIG_TFABOOT=y
++CONFIG_SYS_MALLOC_F_LEN=0x20000
++CONFIG_CUSTOM_SYS_INIT_SP_ADDR=0xc0100000
++CONFIG_ENV_OFFSET=0x480000
++CONFIG_ENV_SECT_SIZE=0x40000
++CONFIG_DEFAULT_DEVICE_TREE="stm32mp157c-ev1"
++CONFIG_SYS_PROMPT="STM32MP> "
++CONFIG_DDR_CACHEABLE_SIZE=0x10000000
++CONFIG_CMD_STM32KEY=y
++CONFIG_TYPEC_STUSB160X=y
++CONFIG_TARGET_ST_STM32MP15x=y
++CONFIG_ENV_OFFSET_REDUND=0x4C0000
++CONFIG_CMD_STM32PROG=y
++# CONFIG_ARMV7_NONSEC is not set
++CONFIG_SYS_LOAD_ADDR=0xc2000000
++CONFIG_SYS_MEMTEST_START=0xc0000000
++CONFIG_SYS_MEMTEST_END=0xc4000000
++CONFIG_FIT=y
++CONFIG_DISTRO_DEFAULTS=y
++CONFIG_BOOTDELAY=1
++CONFIG_BOOTCOMMAND="run bootcmd_stm32mp"
++CONFIG_FDT_SIMPLEFB=y
++CONFIG_SYS_PBSIZE=1050
++CONFIG_SYS_BOOTM_LEN=0x2000000
++CONFIG_CMD_ADTIMG=y
++CONFIG_CMD_ERASEENV=y
++CONFIG_CMD_NVEDIT_EFI=y
++CONFIG_CMD_MEMINFO=y
++CONFIG_CMD_MEMTEST=y
++CONFIG_CMD_UNZIP=y
++CONFIG_CMD_ADC=y
++CONFIG_CMD_CLK=y
++CONFIG_CMD_DFU=y
++CONFIG_CMD_FUSE=y
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_I2C=y
++CONFIG_CMD_MMC=y
++CONFIG_CMD_REMOTEPROC=y
++CONFIG_CMD_SPI=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++CONFIG_SYS_DISABLE_AUTOLOAD=y
++CONFIG_CMD_BMP=y
++CONFIG_CMD_CACHE=y
++CONFIG_CMD_EFIDEBUG=y
++CONFIG_CMD_TIME=y
++CONFIG_CMD_RNG=y
++CONFIG_CMD_TIMER=y
++CONFIG_CMD_PMIC=y
++CONFIG_CMD_REGULATOR=y
++CONFIG_CMD_EXT4_WRITE=y
++CONFIG_CMD_MTDPARTS=y
++CONFIG_CMD_LOG=y
++CONFIG_CMD_UBI=y
++CONFIG_OF_LIVE=y
++CONFIG_ENV_OVERWRITE=y
++CONFIG_ENV_IS_NOWHERE=y
++CONFIG_ENV_IS_IN_MMC=y
++CONFIG_ENV_IS_IN_SPI_FLASH=y
++CONFIG_ENV_IS_IN_UBI=y
++CONFIG_SYS_REDUNDAND_ENVIRONMENT=y
++CONFIG_ENV_UBI_PART="UBI"
++CONFIG_ENV_UBI_VOLUME="uboot_config"
++CONFIG_ENV_UBI_VOLUME_REDUND="uboot_config_r"
++CONFIG_SYS_RELOC_GD_ENV_ADDR=y
++CONFIG_SYS_MMC_ENV_DEV=-1
++CONFIG_ENV_MMC_USE_DT=y
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_TFTP_TSIZE=y
++CONFIG_USE_SERVERIP=y
++CONFIG_SERVERIP="192.168.1.1"
++CONFIG_STM32_ADC=y
++CONFIG_CLK_SCMI=y
++CONFIG_SET_DFU_ALT_INFO=y
++CONFIG_USB_FUNCTION_FASTBOOT=y
++CONFIG_FASTBOOT_BUF_ADDR=0xC0000000
++CONFIG_FASTBOOT_BUF_SIZE=0x02000000
++CONFIG_FASTBOOT_USB_DEV=1
++CONFIG_FASTBOOT_FLASH=y
++CONFIG_FASTBOOT_FLASH_MMC_DEV=1
++CONFIG_FASTBOOT_MMC_BOOT_SUPPORT=y
++CONFIG_FASTBOOT_MMC_BOOT1_NAME="mmc1boot0"
++CONFIG_FASTBOOT_MMC_BOOT2_NAME="mmc1boot1"
++CONFIG_FASTBOOT_MMC_USER_SUPPORT=y
++CONFIG_FASTBOOT_MMC_USER_NAME="mmc1"
++CONFIG_FASTBOOT_CMD_OEM_FORMAT=y
++CONFIG_FASTBOOT_CMD_OEM_PARTCONF=y
++CONFIG_FASTBOOT_CMD_OEM_BOOTBUS=y
++CONFIG_GPIO_HOG=y
++CONFIG_DM_HWSPINLOCK=y
++CONFIG_HWSPINLOCK_STM32=y
++CONFIG_DM_I2C=y
++CONFIG_SYS_I2C_STM32F7=y
++CONFIG_LED=y
++CONFIG_LED_GPIO=y
++CONFIG_STM32_FMC2_EBI=y
++CONFIG_SUPPORT_EMMC_BOOT=y
++CONFIG_STM32_SDMMC2=y
++CONFIG_MTD=y
++CONFIG_DM_MTD=y
++CONFIG_SYS_MTDPARTS_RUNTIME=y
++CONFIG_MTD_RAW_NAND=y
++CONFIG_NAND_STM32_FMC2=y
++CONFIG_SYS_NAND_ONFI_DETECTION=y
++CONFIG_MTD_SPI_NAND=y
++CONFIG_DM_SPI_FLASH=y
++CONFIG_SPI_FLASH_MACRONIX=y
++CONFIG_SPI_FLASH_SPANSION=y
++CONFIG_SPI_FLASH_STMICRO=y
++CONFIG_SPI_FLASH_WINBOND=y
++# CONFIG_SPI_FLASH_USE_4K_SECTORS is not set
++CONFIG_SPI_FLASH_MTD=y
++CONFIG_PHY_MICREL=y
++CONFIG_PHY_REALTEK=y
++CONFIG_DWC_ETH_QOS=y
++CONFIG_PHY=y
++CONFIG_PHY_STM32_USBPHYC=y
++CONFIG_PINCONF=y
++CONFIG_PINCTRL_STMFX=y
++CONFIG_DM_PMIC=y
++CONFIG_PMIC_STPMIC1=y
++CONFIG_DM_REGULATOR=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_DM_REGULATOR_GPIO=y
++CONFIG_DM_REGULATOR_STM32_VREFBUF=y
++CONFIG_DM_REGULATOR_STPMIC1=y
++CONFIG_DM_REGULATOR_SCMI=y
++CONFIG_REMOTEPROC_STM32_COPRO=y
++CONFIG_RESET_SCMI=y
++CONFIG_DM_RNG=y
++CONFIG_RNG_STM32MP1=y
++CONFIG_DM_RTC=y
++CONFIG_RTC_STM32=y
++CONFIG_SERIAL_RX_BUFFER=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
++CONFIG_STM32_QSPI=y
++CONFIG_STM32_SPI=y
++CONFIG_SYSRESET_PSCI=y
++CONFIG_TEE=y
++CONFIG_OPTEE=y
++# CONFIG_OPTEE_TA_AVB is not set
++CONFIG_USB=y
++CONFIG_DM_USB_GADGET=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_EHCI_GENERIC=y
++CONFIG_USB_DWC2=y
++CONFIG_USB_ONBOARD_HUB=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_MANUFACTURER="STMicroelectronics"
++CONFIG_USB_GADGET_VENDOR_NUM=0x0483
++CONFIG_USB_GADGET_PRODUCT_NUM=0x5720
++CONFIG_USB_GADGET_DWC2_OTG=y
++CONFIG_VIDEO=y
++CONFIG_BACKLIGHT_GPIO=y
++CONFIG_VIDEO_LCD_ORISETECH_OTM8009A=y
++CONFIG_VIDEO_LCD_RAYDIUM_RM68200=y
++CONFIG_VIDEO_STM32=y
++CONFIG_VIDEO_STM32_DSI=y
++CONFIG_VIDEO_STM32_MAX_XRES=1280
++CONFIG_VIDEO_STM32_MAX_YRES=800
++CONFIG_BMP_16BPP=y
++CONFIG_BMP_24BPP=y
++CONFIG_BMP_32BPP=y
++CONFIG_WDT=y
++CONFIG_WDT_STM32MP=y
++# CONFIG_BINMAN_FDT is not set
++CONFIG_ERRNO_STR=y
++CONFIG_FDT_FIXUP_PARTITIONS=y
++# CONFIG_LMB_USE_MAX_REGIONS is not set
++CONFIG_LMB_MEMORY_REGIONS=2
++CONFIG_LMB_RESERVED_REGIONS=16
+-- 
+2.30.2
+
