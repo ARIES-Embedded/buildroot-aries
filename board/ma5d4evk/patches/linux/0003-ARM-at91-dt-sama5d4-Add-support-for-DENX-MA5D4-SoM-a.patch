@@ -1,30 +1,31 @@
-From af0410d0d7cf973fb1a10e381fb6b5f179523d78 Mon Sep 17 00:00:00 2001
+From 365dcfe2efc543dbd52f84503d449f24d48afc42 Mon Sep 17 00:00:00 2001
 From: Marek Vasut <marex@denx.de>
-Date: Sat, 14 May 2016 21:25:03 +0200
-Subject: [PATCH 2/7] ARM: at91/dt: sama5d4: Adjust DTS for released board
- version
+Date: Thu, 22 Oct 2015 00:05:08 +0200
+Subject: [PATCH 3/7] ARM: at91/dt: sama5d4: Add support for DENX MA5D4 SoM and
+ EVK
 
-The SoM released on the market has swapped SD card controllers to allow
-booting from the eMMC. The SD card detect was moved to another GPIO too.
-Implement this change into the DT. The prototype board is not available.
+Add support for the DENX MA5D4 SoM and MA5D4EVK board. The system
+consists of a SoM with eMMC, SPI NOR for booting, 2x SPI CAN chip
+and an EVK with microSD slot, 2x UART, 2x CAN port, 3x USB port,
+LEDs and expansion headers.
 
 Signed-off-by: Marek Vasut <marex@denx.de>
 Cc: Alexandre Belloni <alexandre.belloni@free-electrons.com>
 Cc: Josh Wu <josh.wu@atmel.com>
 Cc: Nicolas Ferre <nicolas.ferre@atmel.com>
 ---
- arch/arm/boot/dts/at91-sama5d4_ma5d4emmc.dtsi | 149 +++++++++++++++
- .../boot/dts/at91-sama5d4_ma5d4emmcevk.dts    | 175 ++++++++++++++++++
- 2 files changed, 324 insertions(+)
- create mode 100644 arch/arm/boot/dts/at91-sama5d4_ma5d4emmc.dtsi
- create mode 100644 arch/arm/boot/dts/at91-sama5d4_ma5d4emmcevk.dts
+ arch/arm/boot/dts/at91-sama5d4_ma5d4sf.dtsi   | 141 +++++++++++++++
+ arch/arm/boot/dts/at91-sama5d4_ma5d4sfevk.dts | 171 ++++++++++++++++++
+ 2 files changed, 312 insertions(+)
+ create mode 100644 arch/arm/boot/dts/at91-sama5d4_ma5d4sf.dtsi
+ create mode 100644 arch/arm/boot/dts/at91-sama5d4_ma5d4sfevk.dts
 
-diff --git a/arch/arm/boot/dts/at91-sama5d4_ma5d4emmc.dtsi b/arch/arm/boot/dts/at91-sama5d4_ma5d4emmc.dtsi
+diff --git a/arch/arm/boot/dts/at91-sama5d4_ma5d4sf.dtsi b/arch/arm/boot/dts/at91-sama5d4_ma5d4sf.dtsi
 new file mode 100644
-index 000000000000..d44d0f3ea3a0
+index 000000000000..e3b992aac27f
 --- /dev/null
-+++ b/arch/arm/boot/dts/at91-sama5d4_ma5d4emmc.dtsi
-@@ -0,0 +1,149 @@
++++ b/arch/arm/boot/dts/at91-sama5d4_ma5d4sf.dtsi
+@@ -0,0 +1,141 @@
 +/*
 + * Copyright (C) 2015 Marek Vasut <marex@denx.de>
 + *
@@ -113,16 +114,16 @@ index 000000000000..d44d0f3ea3a0
 +				status = "okay";
 +			};
 +
-+			mmc1: mmc@fc000000 {
++			mmc0: mmc@f8000000 {
 +				pinctrl-names = "default";
-+				pinctrl-0 = <&pinctrl_mmc1_clk_cmd_dat0 &pinctrl_mmc1_dat1_3>;
-+				vmmc-supply = <&vcc_mmc1_reg>;
++				pinctrl-0 = <&pinctrl_mmc0_clk_cmd_dat0 &pinctrl_mmc0_dat1_3 &pinctrl_mmc0_dat4_7>;
++				vmmc-supply = <&vcc_mmc0_reg>;
 +				vqmmc-supply = <&vcc_3v3_reg>;
 +				status = "okay";
 +				dmas = <>;
 +				slot@0 {
 +					reg = <0>;
-+					bus-width = <4>;
++					bus-width = <8>;
 +					broken-cd;
 +				};
 +			};
@@ -141,14 +142,6 @@ index 000000000000..d44d0f3ea3a0
 +				status = "okay";
 +			};
 +
-+			pinctrl@fc06a000 {
-+				som {
-+					pinctrl_mmc1_vcc: mmc1_vcc {
-+						atmel,pins = <AT91_PIOE 15 AT91_PERIPH_GPIO AT91_PINCTRL_PULL_UP>;
-+					};
-+				};
-+			};
-+
 +			watchdog@fc068640 {
 +				status = "okay";
 +			};
@@ -164,22 +157,22 @@ index 000000000000..d44d0f3ea3a0
 +		regulator-always-on;
 +	};
 +
-+	vcc_mmc1_reg: fixedregulator@1 {
++	vcc_mmc0_reg: fixedregulator@1 {
 +		compatible = "regulator-fixed";
 +		gpio = <&pioE 15 GPIO_ACTIVE_HIGH>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_mmc1_vcc>;
-+		regulator-name = "RST_n MCI1";
++		regulator-name = "RST_n MCI0";
 +		regulator-min-microvolt = <3300000>;
 +		regulator-max-microvolt = <3300000>;
++		vin-supply = <&vcc_3v3_reg>;
++		regulator-boot-on;
 +	};
 +};
-diff --git a/arch/arm/boot/dts/at91-sama5d4_ma5d4emmcevk.dts b/arch/arm/boot/dts/at91-sama5d4_ma5d4emmcevk.dts
+diff --git a/arch/arm/boot/dts/at91-sama5d4_ma5d4sfevk.dts b/arch/arm/boot/dts/at91-sama5d4_ma5d4sfevk.dts
 new file mode 100644
-index 000000000000..01b65b06f626
+index 000000000000..3236be8359ff
 --- /dev/null
-+++ b/arch/arm/boot/dts/at91-sama5d4_ma5d4emmcevk.dts
-@@ -0,0 +1,175 @@
++++ b/arch/arm/boot/dts/at91-sama5d4_ma5d4sfevk.dts
+@@ -0,0 +1,171 @@
 +/*
 + * Copyright (C) 2015 Marek Vasut <marex@denx.de>
 + *
@@ -192,7 +185,7 @@ index 000000000000..01b65b06f626
 + */
 +
 +/dts-v1/;
-+#include "at91-sama5d4_ma5d4emmc.dtsi"
++#include "at91-sama5d4_ma5d4sf.dtsi"
 +
 +/ {
 +	model = "DENX MA5D4EVK";
@@ -236,17 +229,17 @@ index 000000000000..01b65b06f626
 +				};
 +			};
 +
-+			mmc0: mmc@f8000000 {
++			mmc1: mmc@fc000000 {
 +				pinctrl-names = "default";
-+				pinctrl-0 = <&pinctrl_mmc0_clk_cmd_dat0 &pinctrl_mmc0_dat1_3 &pinctrl_mmc0_cd>;
-+				vmmc-supply = <&vcc_mmc0_reg>;
++				pinctrl-0 = <&pinctrl_mmc1_clk_cmd_dat0 &pinctrl_mmc1_dat1_3 &pinctrl_mmc1_cd>;
++				vmmc-supply = <&vcc_mmc1_reg>;
 +				vqmmc-supply = <&vcc_3v3_reg>;
 +				status = "okay";
 +				dmas = <>;
 +				slot@0 {
 +					reg = <0>;
 +					bus-width = <4>;
-+					cd-gpios = <&pioE 2 0>;
++					cd-gpios = <&pioE 5 0>;
 +				};
 +			};
 +
@@ -260,11 +253,8 @@ index 000000000000..01b65b06f626
 +
 +			pinctrl@fc06a000 {
 +				board {
-+					pinctrl_mmc0_cd: mmc0_cd {
-+						atmel,pins = <AT91_PIOE 2 AT91_PERIPH_GPIO AT91_PINCTRL_PULL_UP_DEGLITCH>;
-+					};
-+					pinctrl_mmc0_vcc: mmc0_vcc {
-+						atmel,pins = <AT91_PIOE 17 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
++					pinctrl_mmc1_cd: mmc1_cd {
++						atmel,pins = <AT91_PIOE 5 AT91_PERIPH_GPIO AT91_PINCTRL_PULL_UP_DEGLITCH>;
 +					};
 +					pinctrl_usba_vbus: usba_vbus {
 +						atmel,pins =
@@ -327,7 +317,8 @@ index 000000000000..01b65b06f626
 +	};
 +
 +	panel: panel {
-+		compatible = "ampire,am800480r2", "simple-panel";
++		/* Actually Ampire 800480R2 */
++		compatible = "foxlink,fl500wvr00-a0t", "simple-panel";
 +		backlight = <&backlight>;
 +		#address-cells = <1>;
 +		#size-cells = <0>;
@@ -344,12 +335,10 @@ index 000000000000..01b65b06f626
 +		};
 +	};
 +
-+	vcc_mmc0_reg: fixedregulator@2 {
++	vcc_mmc1_reg: fixedregulator@2 {
 +		compatible = "regulator-fixed";
 +		gpio = <&pioE 17 GPIO_ACTIVE_LOW>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_mmc0_vcc>;
-+		regulator-name = "VDD MCI0";
++		regulator-name = "VDD MCI1";
 +		regulator-min-microvolt = <3300000>;
 +		regulator-max-microvolt = <3300000>;
 +		vin-supply = <&vcc_3v3_reg>;

@@ -1,7 +1,7 @@
-From c0af5236027dc6e0d25d7b1054ff117d55aab9b2 Mon Sep 17 00:00:00 2001
+From cd60da2658a7c6adfbf7fc91cd98d3149f10e026 Mon Sep 17 00:00:00 2001
 From: Marek Vasut <marex@denx.de>
 Date: Sat, 11 Jun 2016 15:51:46 +0200
-Subject: [PATCH 1/2] drm/panel: Add support for Ampire AM-800480R2 800x480 7"
+Subject: [PATCH 1/7] drm/panel: Add support for Ampire AM-800480R2 800x480 7"
  panel
 
 This adds support for the AM-800480R2 7" 800x480 panel to the
@@ -12,14 +12,14 @@ Signed-off-by: Marek Vasut <marex@denx.de>
 Cc: Boris Brezillon <boris.brezillon@free-electrons.com>
 Cc: Nicolas Ferre <nicolas.ferre@atmel.com>
 ---
- drivers/gpu/drm/panel/panel-simple.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ drivers/gpu/drm/panel/panel-simple.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
-index 474fa75..b453df6 100644
+index 8a3b685c2fcc..ac1467aaa22c 100644
 --- a/drivers/gpu/drm/panel/panel-simple.c
 +++ b/drivers/gpu/drm/panel/panel-simple.c
-@@ -411,6 +411,31 @@ static const struct panel_desc ampire_am_480272h3tmqw_t01h = {
+@@ -765,6 +765,30 @@ static const struct panel_desc ampire_am_480272h3tmqw_t01h = {
  	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
  };
  
@@ -33,7 +33,6 @@ index 474fa75..b453df6 100644
 +	.vsync_start = 480 + 37,
 +	.vsync_end = 480 + 37 + 2,
 +	.vtotal = 480 + 37 + 2 + 8,
-+	.vrefresh = 60,
 +	.flags = DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC,
 +};
 +
@@ -51,16 +50,16 @@ index 474fa75..b453df6 100644
  static const struct drm_display_mode ampire_am800480r3tmqwa1h_mode = {
  	.clock = 33333,
  	.hdisplay = 800,
-@@ -1939,6 +1964,9 @@ static const struct panel_desc winstar_wf35ltiacd = {
- 
- static const struct of_device_id platform_of_match[] = {
- 	{
-+		.compatible = "ampire,am800480r2",
-+		.data = &ampire_am800480r2,
-+	}, {
- 		.compatible = "ampire,am-480272h3tmqw-t01h",
- 		.data = &ampire_am_480272h3tmqw_t01h,
+@@ -3937,6 +3961,9 @@ static const struct of_device_id platform_of_match[] = {
+ 		.compatible = "ampire,am800600p5tmqw-tb8h",
+ 		.data = &ampire_am800600p5tmqwtb8h,
+ 	}, {
++ 		.compatible = "ampire,am800480r2",
++ 		.data = &ampire_am800480r2,
++ 	}, {
+ 		.compatible = "arm,rtsm-display",
+ 		.data = &arm_rtsm,
  	}, {
 -- 
-2.7.4
+2.34.1
 
