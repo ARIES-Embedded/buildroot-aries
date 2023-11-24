@@ -1,4 +1,4 @@
-From cace34e514bcbd1e10300bb1d17c5fbd3356f2ae Mon Sep 17 00:00:00 2001
+From 27401edcf75e40e3c03a49d6d6d4188e42411d7d Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@grandegger.com>
 Date: Wed, 8 Nov 2023 11:42:22 +0100
 Subject: [PATCH 4/4] ARM: dts: stm32mp157a-msmp1: split device tree in SoM and
@@ -12,8 +12,8 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  arch/arm/boot/dts/Makefile                    |   1 +
  arch/arm/boot/dts/stm32mp157a-msmp1.dtsi      | 427 ++++++++++++++++++
  arch/arm/boot/dts/stm32mp157a-msmp1evk.dts    | 423 +----------------
- arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts |  43 ++
- 4 files changed, 477 insertions(+), 417 deletions(-)
+ arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts |  69 +++
+ 4 files changed, 503 insertions(+), 417 deletions(-)
  create mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1.dtsi
  create mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts
 
@@ -916,10 +916,10 @@ index 04b718680a980..024841c6cea39 100644
 -};
 diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts b/arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts
 new file mode 100644
-index 0000000000000..2688e75dfc34b
+index 0000000000000..fed31de6b380e
 --- /dev/null
 +++ b/arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,69 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 +/*
 + * Copyright (C) 2023 Wolfgang Grandegger <wg@aries-embedded.de>
@@ -963,6 +963,32 @@ index 0000000000000..2688e75dfc34b
 +	};
 +};
 +
++&i2c2 {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&i2c2_pins_d>;
++	pinctrl-1 = <&i2c2_sleep_pins_d>;
++	i2c-scl-rising-time-ns = <185>;
++	i2c-scl-falling-time-ns = <20>;
++	clock-frequency = <400000>;
++	status = "okay";
++	/* spare dmas for other usage */
++	/delete-property/dmas;
++	/delete-property/dma-names;
++
++	pca6416_1: pca6416-1@20 {
++		compatible = "nxp,pca6416";
++		reg = <0x20>;
++		gpio-controller;
++		#gpio-cells = <2>;
++	};
++
++	pca6416_2: pca6416-2@21 {
++		compatible = "nxp,pca6416";
++		reg = <0x21>;
++		gpio-controller;
++		#gpio-cells = <2>;
++	};
++};
 -- 
 2.30.2
 
