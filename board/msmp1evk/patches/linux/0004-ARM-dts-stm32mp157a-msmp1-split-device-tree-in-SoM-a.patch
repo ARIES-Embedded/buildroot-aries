@@ -1,7 +1,7 @@
 From 27401edcf75e40e3c03a49d6d6d4188e42411d7d Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@grandegger.com>
 Date: Wed, 8 Nov 2023 11:42:22 +0100
-Subject: [PATCH 4/4] ARM: dts: stm32mp157a-msmp1: split device tree in SoM and
+Subject: [PATCH 4/5] ARM: dts: stm32mp157a-msmp1: split device tree in SoM and
  EVK parts
 
 We also introduce stm32mp157a-msmp1osmevk.dts for the MSMP1 SoM

@@ -1,7 +1,7 @@
 From ea7b2cb4ebe5c9270968fe649f21596c60cab7c6 Mon Sep 17 00:00:00 2001
 From: Jagan Teki <jagan@amarulasolutions.com>
 Date: Wed, 23 Dec 2020 16:37:57 +0530
-Subject: [PATCH 2/4] ARM: dts: stm32: Add STM32MP1 I2C6 SDA/SCL pinmux
+Subject: [PATCH 2/5] ARM: dts: stm32: Add STM32MP1 I2C6 SDA/SCL pinmux
 
 Add SDA/SCL pinmux lines for I2C6 on STM32MP1.
 

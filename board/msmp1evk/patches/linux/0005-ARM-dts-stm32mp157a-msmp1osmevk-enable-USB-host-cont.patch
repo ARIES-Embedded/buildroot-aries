@@ -1,0 +1,35 @@
+From 389aa3cc9c44d631f3f7cd65cbf4b6c123a94b42 Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@aries-embedded.de>
+Date: Thu, 4 Jul 2024 07:57:56 +0200
+Subject: [PATCH 5/5] ARM: dts: stm32mp157a-msmp1osmevk: enable USB host
+ contoller
+
+Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
+---
+ arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts b/arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts
+index fed31de6b380e..41d3aa4bfca5c 100644
+--- a/arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1osmevk.dts
+@@ -67,3 +67,16 @@ pca6416_2: pca6416-2@21 {
+ 		#gpio-cells = <2>;
+ 	};
+ };
++
++
++&usbh_ehci {
++	phys = <&usbphyc_port0>;
++	phy-names = "usb";
++	status = "okay";
++};
++
++&usbh_ohci {
++	phys = <&usbphyc_port0>;
++	phy-names = "usb";
++	status = "okay";
++};
+-- 
+2.30.2
+
