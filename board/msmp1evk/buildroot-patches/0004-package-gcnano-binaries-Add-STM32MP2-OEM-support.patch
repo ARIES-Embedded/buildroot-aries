@@ -1,0 +1,89 @@
+From 38442e0ef927c1d9ab74201137c05d370d06a84e Mon Sep 17 00:00:00 2001
+From: Romain Gantois <romain.gantois@bootlin.com>
+Date: Fri, 24 May 2024 12:09:48 +0200
+Subject: [PATCH 4/4] package/gcnano-binaries: Add STM32MP2 OEM support
+
+Add initial support for STM32MP257 GPU drivers, which are currently
+provided by the OEM fork of STMicroelectronics' gcnano-binaries repo.
+
+gcnano-binaries will be configured for STM32MP1 platforms on ARM 32-bits
+and STM32MP2 on ARM 64-bits.
+
+Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
+---
+ package/gcnano-binaries/Config.in            |  6 +++---
+ package/gcnano-binaries/gcnano-binaries.hash |  1 +
+ package/gcnano-binaries/gcnano-binaries.mk   | 14 +++++++++++++-
+ 3 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/package/gcnano-binaries/Config.in b/package/gcnano-binaries/Config.in
+index 89f909f2c3..f01468f09f 100644
+--- a/package/gcnano-binaries/Config.in
++++ b/package/gcnano-binaries/Config.in
+@@ -1,15 +1,15 @@
+ comment "gcnano-binaries needs a Linux kernel to be built"
+-	depends on BR2_arm
++	depends on BR2_arm || BR2_aarch64
+ 	depends on !BR2_LINUX_KERNEL
+ 
+ comment "gcnano-binaries needs a glibc toolchain w/ threads, dynamic library"
+-	depends on BR2_arm
++	depends on BR2_arm || BR2_aarch64
+ 	depends on !BR2_TOOLCHAIN_USES_GLIBC || !BR2_TOOLCHAIN_HAS_THREADS \
+ 		|| BR2_STATIC_LIBS
+ 
+ config BR2_PACKAGE_GCNANO_BINARIES
+ 	bool "gcnano-binaries"
+-	depends on BR2_arm
++	depends on BR2_arm || BR2_aarch64
+ 	depends on BR2_LINUX_KERNEL
+ 	depends on BR2_TOOLCHAIN_USES_GLIBC
+ 	depends on BR2_TOOLCHAIN_HAS_THREADS # libdrm, wayland
+diff --git a/package/gcnano-binaries/gcnano-binaries.hash b/package/gcnano-binaries/gcnano-binaries.hash
+index 3192b0d854..3705e790ed 100644
+--- a/package/gcnano-binaries/gcnano-binaries.hash
++++ b/package/gcnano-binaries/gcnano-binaries.hash
+@@ -1,3 +1,4 @@
+ # Locally calculated
+ sha256  8bb1f6ee633f3c30e16b33ff6913286edf31f77b69105a14d147509beba3ea94  gcnano-binaries-5d02efd5cb4cfa85307633891f3cf87550a8bc1d.tar.gz
++sha256  37a50f11e772409a65ed03523f413517f6bb0a15a51bbdb361d9c22a99e77509  gcnano-binaries-0cc45b52557d19888c321c47d6a8f0cb3f4827b5.tar.gz
+ sha256  29c78804b097b5cfee0e802bef9f60348a635640eadd8a91b7ce82ddf17fbf5a  EULA
+diff --git a/package/gcnano-binaries/gcnano-binaries.mk b/package/gcnano-binaries/gcnano-binaries.mk
+index c3aa5d48d2..24a24a9b06 100644
+--- a/package/gcnano-binaries/gcnano-binaries.mk
++++ b/package/gcnano-binaries/gcnano-binaries.mk
+@@ -6,9 +6,20 @@
+ 
+ GCNANO_BINARIES_LIB_VERSION = 6.4.13
+ GCNANO_BINARIES_DRIVER_VERSION = $(GCNANO_BINARIES_LIB_VERSION)
++
++ifeq ($(BR2_arm),y)
+ GCNANO_BINARIES_USERLAND_VERSION = $(GCNANO_BINARIES_LIB_VERSION)-20230517
+ GCNANO_BINARIES_VERSION = 5d02efd5cb4cfa85307633891f3cf87550a8bc1d
+ GCNANO_BINARIES_SITE = $(call github,STMicroelectronics,gcnano-binaries,$(GCNANO_BINARIES_VERSION))
++GCNANO_BINARIES_ARCH_TYPE = arm
++GCNANO_BINARIES_SOC_PLATFORM = st-mp1
++else
++GCNANO_BINARIES_USERLAND_VERSION = stm32mp2-$(GCNANO_BINARIES_LIB_VERSION)-20230412
++GCNANO_BINARIES_VERSION = 0cc45b52557d19888c321c47d6a8f0cb3f4827b5
++GCNANO_BINARIES_SITE = $(call github,stm32mpu-oem,gcnano-binaries,$(GCNANO_BINARIES_VERSION))
++GCNANO_BINARIES_ARCH_TYPE = arm64
++GCNANO_BINARIES_SOC_PLATFORM = st-mp2
++endif
+ 
+ GCNANO_BINARIES_LICENSE = MIT, Vivante End User Software License Terms
+ GCNANO_BINARIES_LICENSE_FILES = EULA
+@@ -38,8 +49,9 @@ GCNANO_BINARIES_POST_EXTRACT_HOOKS += GCNANO_BINARIES_EXTRACT_HELPER
+ GCNANO_BINARIES_MODULE_SUBDIRS = gcnano-driver-stm32mp
+ 
+ GCNANO_BINARIES_MODULE_MAKE_OPTS = \
++	ARCH_TYPE=$(GCNANO_BINARIES_ARCH_TYPE) \
+ 	KERNEL_DIR=$(LINUX_DIR) \
+-	SOC_PLATFORM=st-mp1 \
++	SOC_PLATFORM=$(GCNANO_BINARIES_SOC_PLATFORM) \
+ 	AQROOT=$(@D)/gcnano-driver-stm32mp \
+ 	DEBUG=0
+ 
+-- 
+2.34.1
+
