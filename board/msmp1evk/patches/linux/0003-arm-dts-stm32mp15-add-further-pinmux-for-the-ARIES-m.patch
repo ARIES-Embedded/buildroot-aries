@@ -1,19 +1,51 @@
-From fa26890a271b1016d9ce734f2a0b99f43e182b9b Mon Sep 17 00:00:00 2001
+From 6a3edb8912a9def74350a8daaa2b10e87eb2fe06 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Sat, 6 May 2023 18:35:35 +0200
-Subject: [PATCH 1/5] arm: dts: stm32mp15: add further pinmux for the sdmmc2
- pins 4..7 and m_can
+Subject: [PATCH 3/4] arm: dts: stm32mp15: add further pinmux for the ARIES
+ msmp1evk
+
+We add pinmux for
+
+- i2c2_pins_d: SCL/SDA on PF1/PF0
+- sdmmc2_d47_pins_e: D4..D7 on PE4, PA15, PC6 and PD3
+- m_can2_pins_b: TX/RX on PB13/PB12
+- pwm1_pins_c: on PA8
+- spi4_pins_a: SCK/MOSI/MISO on PE12/PE6/PE13
 
 Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
 ---
- arch/arm/boot/dts/stm32mp15-pinctrl.dtsi | 69 ++++++++++++++++++------
- 1 file changed, 52 insertions(+), 17 deletions(-)
+ arch/arm/boot/dts/stm32mp15-pinctrl.dtsi | 84 ++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
 
 diff --git a/arch/arm/boot/dts/stm32mp15-pinctrl.dtsi b/arch/arm/boot/dts/stm32mp15-pinctrl.dtsi
-index a9d2bec990141..b6d26d2307512 100644
+index e15a3b2a9b399..23aacc90a1a65 100644
 --- a/arch/arm/boot/dts/stm32mp15-pinctrl.dtsi
 +++ b/arch/arm/boot/dts/stm32mp15-pinctrl.dtsi
-@@ -1070,6 +1070,26 @@ pins {
+@@ -632,6 +632,23 @@ pins {
+ 		};
+ 	};
+ 
++	i2c2_pins_d: i2c2-3 {
++		pins {
++			pinmux = <STM32_PINMUX('F', 1, AF4)>, /* I2C2_SCL */
++				 <STM32_PINMUX('F', 0, AF4)>; /* I2C2_SDA */
++			bias-disable;
++			drive-open-drain;
++			slew-rate = <0>;
++		};
++	};
++
++	i2c2_pins_sleep_d: i2c2-sleep-3 {
++		pins {
++			pinmux = <STM32_PINMUX('F', 1, ANALOG)>, /* I2C2_SCL */
++				 <STM32_PINMUX('F', 0, ANALOG)>; /* I2C2_SDA */
++		};
++	};
++
+ 	i2c5_pins_a: i2c5-0 {
+ 		pins {
+ 			pinmux = <STM32_PINMUX('A', 11, AF4)>, /* I2C5_SCL */
+@@ -1070,6 +1087,26 @@ pins {
  		};
  	};
  
@@ -40,7 +72,29 @@ index a9d2bec990141..b6d26d2307512 100644
  	pwm1_pins_a: pwm1-0 {
  		pins {
  			pinmux = <STM32_PINMUX('E', 9, AF1)>, /* TIM1_CH1 */
-@@ -1759,6 +1779,24 @@ pins {
+@@ -1104,6 +1141,21 @@ pins {
+ 		};
+ 	};
+ 
++	pwm1_pins_c: pwm1-2 {
++		pins {
++			pinmux = <STM32_PINMUX('A', 8, AF1)>; /* TIM1_CH1 */
++			bias-pull-down;
++			drive-push-pull;
++			slew-rate = <0>;
++		};
++	};
++
++	pwm1_sleep_pins_c: pwm1-sleep-2 {
++		pins {
++			pinmux = <STM32_PINMUX('A', 8, ANALOG)>; /* TIM1_CH1 */
++		};
++	};
++
+ 	pwm2_pins_a: pwm2-0 {
+ 		pins {
+ 			pinmux = <STM32_PINMUX('A', 3, AF1)>; /* TIM2_CH4 */
+@@ -1759,6 +1811,24 @@ pins {
  		};
  	};
  
@@ -65,7 +119,7 @@ index a9d2bec990141..b6d26d2307512 100644
  	sdmmc3_b4_pins_a: sdmmc3-b4-0 {
  		pins1 {
  			pinmux = <STM32_PINMUX('F', 0, AF9)>, /* SDMMC3_D0 */
-@@ -2109,6 +2147,20 @@ pins {
+@@ -2124,6 +2194,20 @@ pins {
  		};
  	};
  
@@ -86,30 +140,6 @@ index a9d2bec990141..b6d26d2307512 100644
  	usart2_pins_a: usart2-0 {
  		pins1 {
  			pinmux = <STM32_PINMUX('F', 5, AF7)>, /* USART2_TX */
-@@ -2417,23 +2469,6 @@ pins {
- 		};
- 	};
- 
--	i2c6_pins_a: i2c6-0 {
--		pins {
--			pinmux = <STM32_PINMUX('Z', 6, AF2)>, /* I2C6_SCL */
--				 <STM32_PINMUX('Z', 7, AF2)>; /* I2C6_SDA */
--			bias-disable;
--			drive-open-drain;
--			slew-rate = <0>;
--		};
--	};
--
--	i2c6_sleep_pins_a: i2c6-sleep-0 {
--		pins {
--			pinmux = <STM32_PINMUX('Z', 6, ANALOG)>, /* I2C6_SCL */
--				 <STM32_PINMUX('Z', 7, ANALOG)>; /* I2C6_SDA */
--		};
--	};
--
- 	spi1_pins_a: spi1-0 {
- 		pins1 {
- 			pinmux = <STM32_PINMUX('Z', 0, AF5)>, /* SPI1_SCK */
 -- 
 2.30.2
 

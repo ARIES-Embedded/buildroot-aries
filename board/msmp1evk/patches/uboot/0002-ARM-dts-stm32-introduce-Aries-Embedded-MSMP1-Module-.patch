@@ -1,4 +1,4 @@
-From 0bff728854874323082c7cc79d4d4d77ac0fce3a Mon Sep 17 00:00:00 2001
+From fc4914419495df6fa22b3851159be9e798b5ac5f Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Sat, 6 May 2023 10:52:10 +0200
 Subject: [PATCH 2/2] ARM: dts: stm32: introduce Aries Embedded MSMP1 Module on
@@ -22,8 +22,8 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  .../dts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi | 107 +++++
  arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi | 234 +++++++++
  arch/arm/dts/stm32mp157a-msmp1evk.dts         | 449 ++++++++++++++++++
- configs/stm32mp157a-msmp1evk_defconfig        | 174 +++++++
- 5 files changed, 965 insertions(+)
+ configs/stm32mp157a-msmp1evk_defconfig        | 176 +++++++
+ 5 files changed, 967 insertions(+)
  create mode 100644 arch/arm/dts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi
  create mode 100644 arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi
  create mode 100644 arch/arm/dts/stm32mp157a-msmp1evk.dts
@@ -396,7 +396,7 @@ index 0000000000..2b517c8ce9
 +};
 diff --git a/arch/arm/dts/stm32mp157a-msmp1evk.dts b/arch/arm/dts/stm32mp157a-msmp1evk.dts
 new file mode 100644
-index 0000000000..4d85961797
+index 0000000000..acc9bba8ad
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157a-msmp1evk.dts
 @@ -0,0 +1,449 @@
@@ -537,11 +537,11 @@ index 0000000000..4d85961797
 +
 +&ethernet0 {
 +	status = "okay";
-+	pinctrl-0 = <&ethernet0_rmii_pins_c>;
-+	pinctrl-1 = <&ethernet0_rmii_sleep_pins_c>;
++	pinctrl-0 = <&ethernet0_rgmii_pins_b>;
++	pinctrl-1 = <&ethernet0_rgmii_sleep_pins_b>;
 +	pinctrl-names = "default", "sleep";
-+	phy-mode = "rmii";
-+	max-speed = <100>;
++	phy-mode = "rgmii";
++	max-speed = <1000>;
 +	phy-handle = <&phy0>;
 +
 +	mdio0 {
@@ -549,8 +549,8 @@ index 0000000000..4d85961797
 +		#size-cells = <0>;
 +		compatible = "snps,dwmac-mdio";
 +
-+		phy0: ethernet-phy@0 {
-+			reg = <0>;
++		phy0: ethernet-phy@7 {
++			reg = <7>;
 +		};
 +	};
 +};
@@ -851,10 +851,10 @@ index 0000000000..4d85961797
 +};
 diff --git a/configs/stm32mp157a-msmp1evk_defconfig b/configs/stm32mp157a-msmp1evk_defconfig
 new file mode 100644
-index 0000000000..33eb36a03c
+index 0000000000..6ec3995c6e
 --- /dev/null
 +++ b/configs/stm32mp157a-msmp1evk_defconfig
-@@ -0,0 +1,174 @@
+@@ -0,0 +1,176 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_STM32MP=y
 +CONFIG_TFABOOT=y
@@ -970,8 +970,10 @@ index 0000000000..33eb36a03c
 +# CONFIG_SPI_FLASH_USE_4K_SECTORS is not set
 +CONFIG_SPI_FLASH_MTD=y
 +CONFIG_PHY_MICREL=y
++CONFIG_PHY_MICREL_KSZ90X1=y
 +CONFIG_PHY_REALTEK=y
 +CONFIG_DWC_ETH_QOS=y
++CONFIG_RGMII=y
 +CONFIG_PHY=y
 +CONFIG_PHY_STM32_USBPHYC=y
 +CONFIG_PINCONF=y
