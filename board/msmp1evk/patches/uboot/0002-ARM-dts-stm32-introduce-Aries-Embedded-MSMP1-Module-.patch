@@ -1,4 +1,4 @@
-From 3354aa3ba6870764808a92b18c104013785d6c78 Mon Sep 17 00:00:00 2001
+From 84b18416668ac6beeca201c929837aab97de045b Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Sat, 6 May 2023 10:52:10 +0200
 Subject: [PATCH 2/2] ARM: dts: stm32: introduce Aries Embedded MSMP1 Module on
@@ -19,11 +19,11 @@ The following devices are supported
 Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
 ---
  arch/arm/dts/Makefile                         |   1 +
- .../dts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi | 107 +++++
+ .../dts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi | 107 ++++
  arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi | 234 +++++++++
- arch/arm/dts/stm32mp157a-msmp1evk.dts         | 449 ++++++++++++++++++
+ arch/arm/dts/stm32mp157a-msmp1evk.dts         | 461 ++++++++++++++++++
  configs/stm32mp157a-msmp1evk_defconfig        | 176 +++++++
- 5 files changed, 967 insertions(+)
+ 5 files changed, 979 insertions(+)
  create mode 100644 arch/arm/dts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi
  create mode 100644 arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi
  create mode 100644 arch/arm/dts/stm32mp157a-msmp1evk.dts
@@ -396,10 +396,10 @@ index 0000000000..2b517c8ce9
 +};
 diff --git a/arch/arm/dts/stm32mp157a-msmp1evk.dts b/arch/arm/dts/stm32mp157a-msmp1evk.dts
 new file mode 100644
-index 0000000000..1c4f0cfa97
+index 0000000000..2e1c43506f
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157a-msmp1evk.dts
-@@ -0,0 +1,449 @@
+@@ -0,0 +1,461 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 +/*
 + * Copyright (C) STMicroelectronics 2017 - All Rights Reserved
@@ -826,6 +826,18 @@ index 0000000000..1c4f0cfa97
 +	pinctrl-0 = <&uart4_pins_a>;
 +	pinctrl-1 = <&uart4_sleep_pins_a>;
 +	pinctrl-2 = <&uart4_idle_pins_a>;
++	status = "okay";
++};
++
++&usbh_ehci {
++	phys = <&usbphyc_port0>;
++	phy-names = "usb";
++	status = "okay";
++};
++
++&usbh_ohci {
++	phys = <&usbphyc_port0>;
++	phy-names = "usb";
 +	status = "okay";
 +};
 +
