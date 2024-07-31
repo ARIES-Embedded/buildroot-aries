@@ -1,4 +1,4 @@
-From fc4914419495df6fa22b3851159be9e798b5ac5f Mon Sep 17 00:00:00 2001
+From 3354aa3ba6870764808a92b18c104013785d6c78 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Sat, 6 May 2023 10:52:10 +0200
 Subject: [PATCH 2/2] ARM: dts: stm32: introduce Aries Embedded MSMP1 Module on
@@ -396,7 +396,7 @@ index 0000000000..2b517c8ce9
 +};
 diff --git a/arch/arm/dts/stm32mp157a-msmp1evk.dts b/arch/arm/dts/stm32mp157a-msmp1evk.dts
 new file mode 100644
-index 0000000000..acc9bba8ad
+index 0000000000..1c4f0cfa97
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157a-msmp1evk.dts
 @@ -0,0 +1,449 @@
@@ -540,7 +540,7 @@ index 0000000000..acc9bba8ad
 +	pinctrl-0 = <&ethernet0_rgmii_pins_b>;
 +	pinctrl-1 = <&ethernet0_rgmii_sleep_pins_b>;
 +	pinctrl-names = "default", "sleep";
-+	phy-mode = "rgmii";
++	phy-mode = "rgmii-id";
 +	max-speed = <1000>;
 +	phy-handle = <&phy0>;
 +
