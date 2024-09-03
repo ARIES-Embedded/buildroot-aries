@@ -16,11 +16,20 @@ How to build the BSP images is described in the [README.md][3] file in the
 top directory of this repository.
 
 
-SDcard/eMMC Layout
-------------------
+SPI-NOR and SDcard/eMMC Layout
+------------------------------
 
-The layout is defined by `genimage.cfg`. The following partitions are
-created:
+The layout is defined by `genimage.cfg`. The SPI-NOR is partitioned
+as show below:
+
+      Offset   Size  Image
+    0x000000   256K  fsbl1
+    0x040000   256K  fsbl2
+    0x080000     4M  fip
+    0x480000   512K  u-boot-env
+    0x500000     9M  nor_user
+
+And for the SDcard/eMMC the following partitions are created:
 
     Number  Start (sector)    End (sector)  Size Name
          1              34             545  256K fsbl1
@@ -56,6 +65,10 @@ The following files are generated in the `images` sub-directory:
 
       sdcard.img                       # overall SDcard/eMMC image
 
+- Image for the SPI-NOR:
+
+      spi-nor.img                      # overall Boot-loader image
+
 
 Create a bootable microSD card
 ------------------------------
@@ -70,24 +83,26 @@ You may need to adapt the name of the output device.
 
 ### Boot from the microSD card:
 
-- Select to boot mode `101` to boot from the microSD card:
+1. Power-down the board
 
-      Boot[0]: Jumper on JP28 open
-      Boot[1]: Jumper on Pin 7 and 9 of X16 closed
-      Boot[2]: Jumper on Pin 6 and 8 of X16 open
+2. Select the boot mode `101` to boot from the eMMC on the EVK board:
 
-- Connect to the UART connector X7 (located next to the Mini-USB plug)
-  and run your serial communication program, Kermit, Minicom, etc. on
-  the host. The default baudrate is 115200. You need to swap the pin 2
-  and 3 of the serial cable.
+       Boot SW3: OFF
+       Boot SW2: ON
+       Boot SW1: OFF
 
-- Then plug the microSD card into X23.
+3. Then plug the microSD card into X23.
 
-- Power-up the board.
+4. Connect to the UART connector X7 (located next to the Mini-USB plug)
+   and run your serial communication program, Kermit, Minicom, etc. on
+   the host. The default baudrate is 115200. You need to swap the pin 2
+   and 3 of the serial cable.
 
-- The system will start, with the console on the UART.
+5. Power-up the board.
 
-- You can login into `root` without password.
+6. The system will start, with the console on the UART.
+
+7. You can login into `root` without password.
 
 
 Create a bootable eMMC
@@ -130,32 +145,66 @@ in U-Boot by using `=> ums 0 mmc 1` or `=> mmc write ...`.
 Boot from the eMMC
 ------------------
 
-- Power-down the board
+1. Power-down the board
 
-- Select the boot mode `010` to boot from the eMMC on the module:
+2. Select the boot mode `010` to boot from the eMMC on the EVK board:
 
-      Boot[0]: Jumper on JP28 closed
-      Boot[1]: Jumper on Pin 7 and 9 of X16 open
-      Boot[2]: Jumper on Pin 6 and 8 of X16 closed
+       Boot SW3: ON
+       Boot SW2: OFF
+       Boot SW1: ON
 
-- Connect to the UART connector X7 (located next to the Mini-USB plug)
-  and run your serial communication program, Kermit, Minicom, etc. on
-  the host. The default baudrate is 115200. You need to swap the pin 2
-  and 3 of the serial cable.
+3. Then follow the instructions listed above for "Boot from the
+   microSD card" starting at item 4.
 
-- Power-up the board.
-
-- The system will start, with the console on the UART.
-
-- You can login into `root` without password.
-
-- Note that the U-Boot environment is stored in the `fip` partition
-  of the boot device, microSD card or eMMC. Therefore you need to
-  re-set the mac address of the Ethernet interface once at the U-Boot
-  prompt:
+Note: that the U-Boot environment is stored behind the `fip` partition
+in the eMMC. Therefore you need to re-set the MAC address of the
+Ethernet interface once at the U-Boot prompt:
 
     => setenv ethaddr c0:e5:4e:bc:18:6b
     => saveenv
+
+
+Create a bootable SPI-NOR flash
+-------------------------------
+
+The boot-loader (Arm-Trusted-Firmware + U-Boot) can also be installed
+to and booted from the SPI-NOR flash:
+
+- Update from Linux:
+
+  Copy the following files from the `images` directory to the target, e.g.
+  by using `scp` on the host:
+
+      $ scp tf-a-stm32mp157a-msmp1evk.stm32 fip.img root@192.168.0.13:/tmp/
+
+  Then write these on the target to the SPI-NOR flash:
+
+      # flashcp /tmp/tf-a-stm32mp157a-msmp1evk.stm32 /dev/mtd0
+      # flashcp /tmp/tf-a-stm32mp157a-msmp1evk.stm32 /dev/mtd1
+      # flashcp /tmp/fip.bin /dev/mtd2
+
+- Update from U-Boot:
+
+      STM32MP> tftp ${loadaddr} msmp1evk/spi-nor.img
+      STM32MP> sf probe
+      STM32MP> sf erase 0 +${filesize}
+      STM32MP> sf write ${loadaddr} 0 ${filesize}
+
+
+Boot from the SPI-NOR
+---------------------
+
+1. Power-down the board
+
+2. Select the boot mode `001` to boot from the SPI-NOR of the EVK board:
+
+       Boot SW3: ON
+       Boot SW2: ON
+       Boot SW1: OFF
+
+3. Then follow the instructions listed above for "Boot from the
+   microSD card" starting at item 4.
+
 
 [1]: https://www.aries-embedded.com/system-on-module/cpu/stmp157-stmicro-cortexa7-msmp1-osm-ethernet-can
 [2]: https://www.aries-embedded.com/evaluation-kit/cpu/stmp157-stmicro-cortexa7-msmp1-osm-ethernet-can-msmp1evk
