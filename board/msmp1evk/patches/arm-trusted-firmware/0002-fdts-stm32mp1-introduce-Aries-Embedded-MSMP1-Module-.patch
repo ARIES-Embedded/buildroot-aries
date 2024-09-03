@@ -1,4 +1,4 @@
-From 12afeeb0a836a15a8dec0529a06604b78129e08d Mon Sep 17 00:00:00 2001
+From dc8f1799ee9b19133c6720c1536ccb74cb774239 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Fri, 5 May 2023 20:22:36 +0200
 Subject: [PATCH 2/2] fdts: stm32mp1: introduce Aries Embedded MSMP1 Module on
@@ -7,10 +7,10 @@ Subject: [PATCH 2/2] fdts: stm32mp1: introduce Aries Embedded MSMP1 Module on
 It uses 1x8Gb LPDDR3 memory
 ---
  fdts/stm32mp15-bl32.dtsi                   |   2 +-
- fdts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi | 107 +++++++
+ fdts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi | 107 ++++++
  fdts/stm32mp157a-msmp1evk-fw-config.dts    |   7 +
- fdts/stm32mp157a-msmp1evk.dts              | 346 +++++++++++++++++++++
- 4 files changed, 461 insertions(+), 1 deletion(-)
+ fdts/stm32mp157a-msmp1evk.dts              | 365 +++++++++++++++++++++
+ 4 files changed, 480 insertions(+), 1 deletion(-)
  create mode 100644 fdts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi
  create mode 100644 fdts/stm32mp157a-msmp1evk-fw-config.dts
  create mode 100644 fdts/stm32mp157a-msmp1evk.dts
@@ -156,10 +156,10 @@ index 000000000..2abbe50e6
 +#include "stm32mp15-fw-config.dtsi"
 diff --git a/fdts/stm32mp157a-msmp1evk.dts b/fdts/stm32mp157a-msmp1evk.dts
 new file mode 100644
-index 000000000..474e49a28
+index 000000000..b7d0c5b85
 --- /dev/null
 +++ b/fdts/stm32mp157a-msmp1evk.dts
-@@ -0,0 +1,346 @@
+@@ -0,0 +1,365 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 +/*
 + * Copyright (c) 2017-2022, STMicroelectronics - All Rights Reserved
@@ -465,6 +465,25 @@ index 000000000..474e49a28
 +		compatible = "st,stm32mp1-pll";
 +		reg = <3>;
 +		cfg = <3 98 5 7 7 PQR(1,1,1)>;
++	};
++};
++
++&qspi {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&qspi_clk_pins_a &qspi_bk1_pins_a>;
++	reg = <0x58003000 0x1000>, <0x70000000 0x4000000>;
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	flash0: flash@0 {
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-rx-bus-width = <4>;
++		spi-tx-bus-width = <4>;
++		spi-max-frequency = <108000000>;
++		#address-cells = <1>;
++		#size-cells = <1>;
 +	};
 +};
 +
