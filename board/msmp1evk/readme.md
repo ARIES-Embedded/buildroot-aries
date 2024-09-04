@@ -4,9 +4,9 @@ ARIES Embedded module MSMP1 on Evaluation Kit MSMP1EVK
 Introduction
 ------------
 
-This README describes how to build the firmware for the ARIES Embedded
-System on Module (SoM) [MSMP1][1] and the Evaluation Kit (EVK)
-[MSMP1EVK][2].
+This README describes how to build and install the firmware for the
+ARIES Embedded System on Module (SoM) [MSMP1][1] and the Evaluation Kit
+(EVK) [MSMP1EVK][2].
 
 
 Build
@@ -81,15 +81,16 @@ On your host, copy the file `sdcard.img` onto a microSD card with
 You may need to adapt the name of the output device.
 
 
-### Boot from the microSD card:
+Boot from the microSD card
+--------------------------
 
 1. Power-down the board
 
 2. Select the boot mode `101` to boot from the eMMC on the EVK board:
 
-       Boot SW3: OFF
-       Boot SW2: ON
-       Boot SW1: OFF
+       BOOT SW3: OFF
+       BOOT SW2: ON
+       BOOT SW1: OFF
 
 3. Then plug the microSD card into X23.
 
@@ -103,6 +104,13 @@ You may need to adapt the name of the output device.
 6. The system will start, with the console on the UART.
 
 7. You can login into `root` without password.
+
+Note: the U-Boot environment is stored behind the `fip` partition in
+the SDcard/eMMC. Therefore you need to re-set the MAC address of the
+Ethernet interface once at the U-Boot prompt:
+
+    => setenv ethaddr c0:e5:4e:bc:18:6b
+    => saveenv
 
 
 Create a bootable eMMC
@@ -149,19 +157,12 @@ Boot from the eMMC
 
 2. Select the boot mode `010` to boot from the eMMC on the EVK board:
 
-       Boot SW3: ON
-       Boot SW2: OFF
-       Boot SW1: ON
+       BOOT SW3: ON
+       BOOT SW2: OFF
+       BOOT SW1: ON
 
 3. Then follow the instructions listed above for "Boot from the
    microSD card" starting at item 4.
-
-Note: that the U-Boot environment is stored behind the `fip` partition
-in the eMMC. Therefore you need to re-set the MAC address of the
-Ethernet interface once at the U-Boot prompt:
-
-    => setenv ethaddr c0:e5:4e:bc:18:6b
-    => saveenv
 
 
 Create a bootable SPI-NOR flash
@@ -175,13 +176,17 @@ to and booted from the SPI-NOR flash:
   Copy the following files from the `images` directory to the target, e.g.
   by using `scp` on the host:
 
-      $ scp tf-a-stm32mp157a-msmp1evk.stm32 fip.img root@192.168.0.13:/tmp/
+      $ scp tf-a-stm32mp157a-msmp1evk.stm32 fip.bin spi-nor.img root@192.168.0.13:/tmp/
 
   Then write these on the target to the SPI-NOR flash:
 
       # flashcp /tmp/tf-a-stm32mp157a-msmp1evk.stm32 /dev/mtd0
       # flashcp /tmp/tf-a-stm32mp157a-msmp1evk.stm32 /dev/mtd1
       # flashcp /tmp/fip.bin /dev/mtd2
+
+  or if you booted from the SDcard/eMMC
+
+      # flashcp /tmp/spi-nor.img /dev/mtd0
 
 - Update from U-Boot:
 
@@ -198,9 +203,9 @@ Boot from the SPI-NOR
 
 2. Select the boot mode `001` to boot from the SPI-NOR of the EVK board:
 
-       Boot SW3: ON
-       Boot SW2: ON
-       Boot SW1: OFF
+       BOOT SW3: ON
+       BOOT SW2: ON
+       BOOT SW1: OFF
 
 3. Then follow the instructions listed above for "Boot from the
    microSD card" starting at item 4.
