@@ -103,14 +103,26 @@ Boot from the microSD card
 
 6. The system will start, with the console on the UART.
 
-7. You can login into `root` without password.
-
-Note: the U-Boot environment is stored behind the `fip` partition in
-the SDcard/eMMC. Therefore you need to re-set the MAC address of the
-Ethernet interface once at the U-Boot prompt:
+7. The U-Boot environment is stored behind the `fip` partition in the
+   SDcard/eMMC. Therefore you need to re-set the MAC address of the
+   Ethernet interface once at the U-Boot prompt:
 
     => setenv ethaddr c0:e5:4e:bc:18:6b
     => saveenv
+
+8. You can login into `root` without password.
+
+9. The Linux device-tree used at boot is defined in `extlinux.conf`:
+
+       # cat /boot/extlinux/extlinux.conf
+       label stm32mp157a-msmp1evk-buildroot
+         kernel /boot/zImage
+         devicetree /boot/stm32mp157a-msmp1evk.dtb
+       #  devicetree /boot/stm32mp157a-msmp1evk-rgb-panel.dtb
+         append root=/dev/mmcblk0p4 rootwait
+
+   If you have an RGP panel attached, please modify that file
+   using `devicetree /boot/stm32mp157a-msmp1evk-rgb-panel.dtb`.
 
 
 Create a bootable eMMC
