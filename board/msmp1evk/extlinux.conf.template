@@ -1,0 +1,5 @@
+label %BOARD_NAME%-buildroot
+  kernel /boot/zImage
+  devicetree /boot/%BOARD_NAME%.dtb
+# devicetree /boot/%BOARD_NAME%-rgb-panel.dtb
+  append root=/dev/mmcblk0p4 rootwait

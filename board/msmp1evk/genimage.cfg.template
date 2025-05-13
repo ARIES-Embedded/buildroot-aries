@@ -10,12 +10,12 @@ image spi-nor.img {
 	flashtype = "nor-16M-256"
 
 	partition fsbl1 {
-		image = "tf-a-stm32mp157a-msmp1evk.stm32"
+		image = "tf-a-%BOARD_NAME%.stm32"
 		size = 256K
 	}
 
 	partition fsbl2 {
-		image = "tf-a-stm32mp157a-msmp1evk.stm32"
+		image = "tf-a-%BOARD_NAME%.stm32"
 		size = 256K
 	}
 
@@ -32,12 +32,12 @@ image sdcard.img {
 	}
 
 	partition fsbl1 {
-		image = "tf-a-stm32mp157a-msmp1evk.stm32"
+		image = "tf-a-%BOARD_NAME%.stm32"
 		size = 256K
 	}
 
 	partition fsbl2 {
-		image = "tf-a-stm32mp157a-msmp1evk.stm32"
+		image = "tf-a-%BOARD_NAME%.stm32"
 		size = 256K
 	}
 
