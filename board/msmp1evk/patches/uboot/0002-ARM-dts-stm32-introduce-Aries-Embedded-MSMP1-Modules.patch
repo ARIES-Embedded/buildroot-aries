@@ -1,7 +1,7 @@
 From ed80c6b0c019b8579b8684cc59b2e18464a14a4e Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Sat, 6 May 2023 10:52:10 +0200
-Subject: [PATCH 2/2] ARM: dts: stm32: introduce Aries Embedded MSMP1 Modules
+Subject: [PATCH 2/3] ARM: dts: stm32: introduce Aries Embedded MSMP1 Modules
  on MSMP1EVK
 
 Add support for the ARIES Embedded System on Modules (SoM) MSMP1 on
