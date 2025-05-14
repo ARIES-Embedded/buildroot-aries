@@ -1,7 +1,7 @@
-From 8e126b792587e8ab06b9d0f5be702420c11a52b4 Mon Sep 17 00:00:00 2001
+From 6aa9f1cbc3aba6dd169aae4cfb4eac6095c64d49 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Sat, 6 May 2023 18:36:16 +0200
-Subject: [PATCH 4/4] ARM: dts: stm32: introduce Aries Embedded MSMP1 Modules
+Subject: [PATCH 4/5] ARM: dts: stm32: introduce Aries Embedded MSMP1 Modules
  on MSMP1EVK
 
 Add support for the ARIES Embedded System on Module (SoM) MSMP1 on
@@ -1129,7 +1129,7 @@ index 0000000000000..974c050f934a9
 +};
 diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1evk-rgb-panel.dts b/arch/arm/boot/dts/stm32mp157c-msmp1evk-rgb-panel.dts
 new file mode 100644
-index 0000000000000..e8eaeac15174a
+index 0000000000000..a0381815e7811
 --- /dev/null
 +++ b/arch/arm/boot/dts/stm32mp157c-msmp1evk-rgb-panel.dts
 @@ -0,0 +1,165 @@
@@ -1141,7 +1141,7 @@ index 0000000000000..e8eaeac15174a
 +/dts-v1/;
 +
 +// The OSM test adapter board is sligtly different than the OSMEVK
-+//#define OSM_TESTADAPTER 1
++#define OSM_TESTADAPTER 1
 +
 +#include "stm32mp157c-msmp1evk.dtsi"
 +

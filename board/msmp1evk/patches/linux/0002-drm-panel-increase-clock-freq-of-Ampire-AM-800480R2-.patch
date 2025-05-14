@@ -1,7 +1,7 @@
 From de82b265b769e4a7755cb3ce0d6deabe6d1eab50 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Sat, 6 Aug 2022 14:55:15 +0200
-Subject: [PATCH 2/4] drm/panel: increase clock freq of Ampire AM-800480R2 to
+Subject: [PATCH 2/5] drm/panel: increase clock freq of Ampire AM-800480R2 to
  get 60 Hz vrefresh
 
 Commit 0425662fdf05665235e768e2fbcb4ced12432b43 nukes the mode->vrefresh

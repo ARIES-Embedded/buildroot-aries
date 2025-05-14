@@ -1,7 +1,7 @@
 From 6a3edb8912a9def74350a8daaa2b10e87eb2fe06 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Sat, 6 May 2023 18:35:35 +0200
-Subject: [PATCH 3/4] arm: dts: stm32mp15: add further pinmux for the ARIES
+Subject: [PATCH 3/5] arm: dts: stm32mp15: add further pinmux for the ARIES
  msmp1evk
 
 We add pinmux for
