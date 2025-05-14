@@ -30,7 +30,8 @@ If the maintenance branch `2023.02.x` is not yet available, please use:
         $ cd buildroot
         $ git checkout -b aries-2023.02 2023.02
 
-For the MSMP1EVK, you also need to apply some temporary patches for theARM Trusted Firmware and U-Boot boot loader:
+For the MSMP1EVK, you also need to apply some temporary patches for th ARM
+Trusted Firmware and U-Boot boot loader:
 
         $ cd $WORK_DIR/buildroot
         $ git am $WORK_DIR/buildroot-aries/board/msmp1evk/buildroot-patches/*.patch
@@ -40,6 +41,8 @@ Then create a build directory for the default configuration:
         $ cd $WORK_DIR/buildroot
         $ make BR2_EXTERNAL=$WORK_DIR/buildroot-aries \
             O=$WORK_DIR/mcvevk mcvevk_defconfig
+
+You can find the available defconfigs in `=WORK_DIR/buildroot-aries/configs/`.
 
 And finally make the BSP for the MCVEVP:
 
