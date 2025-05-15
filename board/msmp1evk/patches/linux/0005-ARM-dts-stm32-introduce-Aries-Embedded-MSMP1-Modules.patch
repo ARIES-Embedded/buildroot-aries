@@ -1,0 +1,340 @@
+From 6054fabe3ed464b9d4d6cb92e1fa9e2ab15ff9c7 Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@aries-embedded.de>
+Date: Wed, 14 May 2025 13:57:39 +0200
+Subject: [PATCH 5/5] ARM: dts: stm32: introduce Aries Embedded MSMP1 Modules
+ on TESTADAP
+
+The OSM Test Adapter does have a slightly different hardware than
+the EVK. Therefore we add a dedicated device-tree file.
+
+Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
+---
+ arch/arm/boot/dts/Makefile                    |  1 +
+ .../dts/stm32mp157c-msmp1evk-rgb-panel.dts    | 94 -------------------
+ arch/arm/boot/dts/stm32mp157c-msmp1evk.dtsi   | 81 +++++++++++++---
+ .../stm32mp157c-msmp1testadap-rgb-panel.dts   | 67 +++++++++++++
+ 4 files changed, 137 insertions(+), 106 deletions(-)
+ create mode 100644 arch/arm/boot/dts/stm32mp157c-msmp1testadap-rgb-panel.dts
+
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index eb90d097b424c..7ad28e17db935 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -1245,6 +1245,7 @@ dtb-$(CONFIG_ARCH_STM32) += \
+ 	stm32mp157c-lxa-mc1.dtb \
+ 	stm32mp157c-msmp1evk.dtb \
+ 	stm32mp157c-msmp1evk-rgb-panel.dtb \
++	stm32mp157c-msmp1testadap-rgb-panel.dtb \
+ 	stm32mp157c-odyssey.dtb
+ dtb-$(CONFIG_MACH_SUN4I) += \
+ 	sun4i-a10-a1000.dtb \
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1evk-rgb-panel.dts b/arch/arm/boot/dts/stm32mp157c-msmp1evk-rgb-panel.dts
+index a0381815e7811..5d7b93bc0aceb 100644
+--- a/arch/arm/boot/dts/stm32mp157c-msmp1evk-rgb-panel.dts
++++ b/arch/arm/boot/dts/stm32mp157c-msmp1evk-rgb-panel.dts
+@@ -5,30 +5,21 @@
+ 
+ /dts-v1/;
+ 
+-// The OSM test adapter board is sligtly different than the OSMEVK
+-#define OSM_TESTADAPTER 1
+-
+ #include "stm32mp157c-msmp1evk.dtsi"
+ 
+ / {
+ 	model = "Aries Embedded STM32MP157C MSMP1 SoM on EVK with RGB panel";
+ 
+-#ifndef OSM_TESTADAPTER
+ 	backlight: backlight {
+ 		compatible = "pwm-backlight";
+                 pwms = <&pwm1 0 100000 0>;
+                 brightness-levels = <0 31 63 95 127 159 191 223 255>;
+ 		default-brightness-level = <6>;
+ 	};
+-#endif
+ 
+ 	panel_rgb: panel-rgb {
+ 		compatible = "ampire,am800480r2";
+-#ifndef OSM_TESTADAPTER
+ 		backlight = <&backlight>;
+-#else
+-		enable-gpios = <&gpioa 3 GPIO_ACTIVE_HIGH>;
+-#endif
+ 
+ 		port {
+ 			panel_rgb_input: endpoint {
+@@ -38,7 +29,6 @@ panel_rgb_input: endpoint {
+ 	};
+ };
+ 
+-#ifndef OSM_TESTADAPTER
+ &i2c2 {
+ 	touch: ft5426@38 {
+ 		compatible = "edt,edt-ft5506";
+@@ -51,31 +41,6 @@ touch: ft5426@38 {
+ 		status = "okay";
+ 	};
+ };
+-#else
+-&i2c6 {
+-	pinctrl-names = "default", "sleep";
+-	pinctrl-0 = <&i2c6_pins_a>;
+-	pinctrl-1 = <&i2c6_sleep_pins_a>;
+-	i2c-scl-rising-time-ns = <185>;
+-	i2c-scl-falling-time-ns = <20>;
+-	clock-frequency = <400000>;
+-	status = "okay";
+-	/* spare dmas for other usage */
+-	/delete-property/dmas;
+-	/delete-property/dma-names;
+-
+-	touch: ft5426@38 {
+-		compatible = "edt,edt-ft5506";
+-		reg = <0x38>;
+-		interrupt-parent = <&gpioj>;
+-		interrupts = <13 IRQ_TYPE_EDGE_FALLING>; /* PJ13 */
+-		touchscreen-size-x = <800>;
+-		touchscreen-size-y = <480>;
+-		wakeup-source;
+-		status = "okay";
+-	};
+-};
+-#endif
+ 
+ &timers1 {
+ 	/* spare dmas for other usage (un-delete to enable pwm capture) */
+@@ -104,62 +69,3 @@ ltdc_ep0_out: endpoint@0 {
+ 		};
+ 	};
+ };
+-
+-&pinctrl {
+-	ltdc_pins_b2: ltdc-1b2 {
+-		pins {
+-			pinmux = <STM32_PINMUX('I', 14, AF14)>, /* LCD_CLK */
+-				 <STM32_PINMUX('I', 12, AF14)>, /* LCD_HSYNC */
+-				 <STM32_PINMUX('I', 13, AF14)>, /* LCD_VSYNC */
+-				 <STM32_PINMUX('K',  7, AF14)>, /* LCD_DE */
+-				 <STM32_PINMUX('J',  1, AF14)>, /* LCD_R2 */
+-				 <STM32_PINMUX('J',  2, AF14)>, /* LCD_R3 */
+-				 <STM32_PINMUX('J',  3, AF14)>, /* LCD_R4 */
+-				 <STM32_PINMUX('J',  4, AF14)>, /* LCD_R5 */
+-				 <STM32_PINMUX('J',  5, AF14)>, /* LCD_R6 */
+-				 <STM32_PINMUX('J',  6, AF14)>, /* LCD_R7 */
+-				 <STM32_PINMUX('J',  9, AF14)>, /* LCD_G2 */
+-				 <STM32_PINMUX('J', 10, AF14)>, /* LCD_G3 */
+-				 <STM32_PINMUX('J', 11, AF14)>, /* LCD_G4 */
+-				 <STM32_PINMUX('K',  0, AF14)>, /* LCD_G5 */
+-				 <STM32_PINMUX('K',  1, AF14)>, /* LCD_G6 */
+-				 <STM32_PINMUX('K',  2, AF14)>, /* LCD_G7 */
+-				 <STM32_PINMUX('J', 14, AF14)>, /* LCD_B2 */
+-				 <STM32_PINMUX('J', 15, AF14)>, /* LCD_B3 */
+-				 <STM32_PINMUX('K',  3, AF14)>, /* LCD_B4 */
+-				 <STM32_PINMUX('K',  4, AF14)>, /* LCD_B5 */
+-				 <STM32_PINMUX('K',  5, AF14)>, /* LCD_B6 */
+-				 <STM32_PINMUX('K',  6, AF14)>; /* LCD_B7 */
+-			bias-disable;
+-			drive-push-pull;
+-			slew-rate = <1>;
+-		};
+-	};
+-
+-	ltdc_sleep_pins_b2: ltdc-sleep-1b2 {
+-		pins {
+-			pinmux = <STM32_PINMUX('I', 14, ANALOG)>, /* LCD_CLK */
+-				 <STM32_PINMUX('I', 12, ANALOG)>, /* LCD_HSYNC */
+-				 <STM32_PINMUX('I', 13, ANALOG)>, /* LCD_VSYNC */
+-				 <STM32_PINMUX('K',  7, ANALOG)>, /* LCD_DE */
+-				 <STM32_PINMUX('J',  1, ANALOG)>, /* LCD_R2 */
+-				 <STM32_PINMUX('J',  2, ANALOG)>, /* LCD_R3 */
+-				 <STM32_PINMUX('J',  3, ANALOG)>, /* LCD_R4 */
+-				 <STM32_PINMUX('J',  4, ANALOG)>, /* LCD_R5 */
+-				 <STM32_PINMUX('J',  5, ANALOG)>, /* LCD_R6 */
+-				 <STM32_PINMUX('J',  6, ANALOG)>, /* LCD_R7 */
+-				 <STM32_PINMUX('J',  9, ANALOG)>, /* LCD_G2 */
+-				 <STM32_PINMUX('J', 10, ANALOG)>, /* LCD_G3 */
+-				 <STM32_PINMUX('J', 11, ANALOG)>, /* LCD_G4 */
+-				 <STM32_PINMUX('K',  0, ANALOG)>, /* LCD_G5 */
+-				 <STM32_PINMUX('K',  1, ANALOG)>, /* LCD_G6 */
+-				 <STM32_PINMUX('K',  2, ANALOG)>, /* LCD_G7 */
+-				 <STM32_PINMUX('J', 14, ANALOG)>, /* LCD_B2 */
+-				 <STM32_PINMUX('J', 15, ANALOG)>, /* LCD_B3 */
+-				 <STM32_PINMUX('K',  3, ANALOG)>, /* LCD_B4 */
+-				 <STM32_PINMUX('K',  4, ANALOG)>, /* LCD_B5 */
+-				 <STM32_PINMUX('K',  5, ANALOG)>, /* LCD_B6 */
+-				 <STM32_PINMUX('K',  6, ANALOG)>; /* LCD_B7 */
+-		};
+-	};
+-};
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1evk.dtsi b/arch/arm/boot/dts/stm32mp157c-msmp1evk.dtsi
+index b7d4909d81179..bcd1fc940f1e6 100644
+--- a/arch/arm/boot/dts/stm32mp157c-msmp1evk.dtsi
++++ b/arch/arm/boot/dts/stm32mp157c-msmp1evk.dtsi
+@@ -51,22 +51,79 @@ &i2c2 {
+ 	/* spare dmas for other usage */
+ 	/delete-property/dmas;
+ 	/delete-property/dma-names;
++};
+ 
+-#ifdef OSM_TESTADAPTER
+-	pca6416_1: pca6416-1@20 {
+-		compatible = "nxp,pca6416";
+-		reg = <0x20>;
+-		gpio-controller;
+-		#gpio-cells = <2>;
++&i2c6 {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&i2c6_pins_a>;
++	pinctrl-1 = <&i2c6_sleep_pins_a>;
++	i2c-scl-rising-time-ns = <185>;
++	i2c-scl-falling-time-ns = <20>;
++	clock-frequency = <400000>;
++	status = "okay";
++	/* spare dmas for other usage */
++	/delete-property/dmas;
++	/delete-property/dma-names;
++};
++
++&pinctrl {
++	// The display does not use LCD_R[0..1], LCD_G[0..1] and LCD_B[0..1]
++	ltdc_pins_b2: ltdc-1b2 {
++		pins {
++			pinmux = <STM32_PINMUX('I', 14, AF14)>, /* LCD_CLK */
++				 <STM32_PINMUX('I', 12, AF14)>, /* LCD_HSYNC */
++				 <STM32_PINMUX('I', 13, AF14)>, /* LCD_VSYNC */
++				 <STM32_PINMUX('K',  7, AF14)>, /* LCD_DE */
++				 <STM32_PINMUX('J',  1, AF14)>, /* LCD_R2 */
++				 <STM32_PINMUX('J',  2, AF14)>, /* LCD_R3 */
++				 <STM32_PINMUX('J',  3, AF14)>, /* LCD_R4 */
++				 <STM32_PINMUX('J',  4, AF14)>, /* LCD_R5 */
++				 <STM32_PINMUX('J',  5, AF14)>, /* LCD_R6 */
++				 <STM32_PINMUX('J',  6, AF14)>, /* LCD_R7 */
++				 <STM32_PINMUX('J',  9, AF14)>, /* LCD_G2 */
++				 <STM32_PINMUX('J', 10, AF14)>, /* LCD_G3 */
++				 <STM32_PINMUX('J', 11, AF14)>, /* LCD_G4 */
++				 <STM32_PINMUX('K',  0, AF14)>, /* LCD_G5 */
++				 <STM32_PINMUX('K',  1, AF14)>, /* LCD_G6 */
++				 <STM32_PINMUX('K',  2, AF14)>, /* LCD_G7 */
++				 <STM32_PINMUX('J', 14, AF14)>, /* LCD_B2 */
++				 <STM32_PINMUX('J', 15, AF14)>, /* LCD_B3 */
++				 <STM32_PINMUX('K',  3, AF14)>, /* LCD_B4 */
++				 <STM32_PINMUX('K',  4, AF14)>, /* LCD_B5 */
++				 <STM32_PINMUX('K',  5, AF14)>, /* LCD_B6 */
++				 <STM32_PINMUX('K',  6, AF14)>; /* LCD_B7 */
++			bias-disable;
++			drive-push-pull;
++			slew-rate = <1>;
++		};
+ 	};
+ 
+-	pca6416_2: pca6416-2@21 {
+-		compatible = "nxp,pca6416";
+-		reg = <0x21>;
+-		gpio-controller;
+-		#gpio-cells = <2>;
++	ltdc_sleep_pins_b2: ltdc-sleep-1b2 {
++		pins {
++			pinmux = <STM32_PINMUX('I', 14, ANALOG)>, /* LCD_CLK */
++				 <STM32_PINMUX('I', 12, ANALOG)>, /* LCD_HSYNC */
++				 <STM32_PINMUX('I', 13, ANALOG)>, /* LCD_VSYNC */
++				 <STM32_PINMUX('K',  7, ANALOG)>, /* LCD_DE */
++				 <STM32_PINMUX('J',  1, ANALOG)>, /* LCD_R2 */
++				 <STM32_PINMUX('J',  2, ANALOG)>, /* LCD_R3 */
++				 <STM32_PINMUX('J',  3, ANALOG)>, /* LCD_R4 */
++				 <STM32_PINMUX('J',  4, ANALOG)>, /* LCD_R5 */
++				 <STM32_PINMUX('J',  5, ANALOG)>, /* LCD_R6 */
++				 <STM32_PINMUX('J',  6, ANALOG)>, /* LCD_R7 */
++				 <STM32_PINMUX('J',  9, ANALOG)>, /* LCD_G2 */
++				 <STM32_PINMUX('J', 10, ANALOG)>, /* LCD_G3 */
++				 <STM32_PINMUX('J', 11, ANALOG)>, /* LCD_G4 */
++				 <STM32_PINMUX('K',  0, ANALOG)>, /* LCD_G5 */
++				 <STM32_PINMUX('K',  1, ANALOG)>, /* LCD_G6 */
++				 <STM32_PINMUX('K',  2, ANALOG)>, /* LCD_G7 */
++				 <STM32_PINMUX('J', 14, ANALOG)>, /* LCD_B2 */
++				 <STM32_PINMUX('J', 15, ANALOG)>, /* LCD_B3 */
++				 <STM32_PINMUX('K',  3, ANALOG)>, /* LCD_B4 */
++				 <STM32_PINMUX('K',  4, ANALOG)>, /* LCD_B5 */
++				 <STM32_PINMUX('K',  5, ANALOG)>, /* LCD_B6 */
++				 <STM32_PINMUX('K',  6, ANALOG)>; /* LCD_B7 */
++		};
+ 	};
+-#endif
+ };
+ 
+ &usbh_ehci {
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1testadap-rgb-panel.dts b/arch/arm/boot/dts/stm32mp157c-msmp1testadap-rgb-panel.dts
+new file mode 100644
+index 0000000000000..0f5a477a86ad0
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157c-msmp1testadap-rgb-panel.dts
+@@ -0,0 +1,67 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) 2023-2024 Wolfgang Grandegger <wg@aries-embedded.de>
++ */
++
++/dts-v1/;
++
++#include "stm32mp157c-msmp1evk.dtsi"
++
++/ {
++	model = "Aries Embedded STM32MP157C MSMP1 SoM on TESTADAP with RGB panel";
++
++
++	panel_rgb: panel-rgb {
++		compatible = "ampire,am800480r2";
++		enable-gpios = <&gpioa 3 GPIO_ACTIVE_HIGH>;
++
++		port {
++			panel_rgb_input: endpoint {
++				remote-endpoint = <&ltdc_ep0_out>;
++			};
++		};
++	};
++};
++
++&i2c2 {
++	pca6416_1: pca6416-1@20 {
++		compatible = "nxp,pca6416";
++		reg = <0x20>;
++		gpio-controller;
++		#gpio-cells = <2>;
++	};
++
++	pca6416_2: pca6416-2@21 {
++		compatible = "nxp,pca6416";
++		reg = <0x21>;
++		gpio-controller;
++		#gpio-cells = <2>;
++	};
++};
++
++&i2c6 {
++	touch: ft5426@38 {
++		compatible = "edt,edt-ft5506";
++		reg = <0x38>;
++		interrupt-parent = <&gpioj>;
++		interrupts = <13 IRQ_TYPE_EDGE_FALLING>; /* PJ13 */
++		touchscreen-size-x = <800>;
++		touchscreen-size-y = <480>;
++		wakeup-source;
++		status = "okay";
++	};
++};
++
++&ltdc {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&ltdc_pins_b2>;
++	pinctrl-1 = <&ltdc_sleep_pins_b2>;
++	status = "okay";
++
++	port {
++		ltdc_ep0_out: endpoint@0 {
++			reg = <0>;
++			remote-endpoint = <&panel_rgb_input>;
++		};
++	};
++};
+-- 
+2.30.2
+
