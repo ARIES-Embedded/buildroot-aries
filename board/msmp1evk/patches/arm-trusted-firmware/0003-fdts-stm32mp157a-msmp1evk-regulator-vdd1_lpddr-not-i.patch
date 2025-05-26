@@ -1,0 +1,28 @@
+From a80913ca2e8e512fa63d496cd891b3c075734949 Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@aries-embedded.de>
+Date: Mon, 26 May 2025 16:23:33 +0200
+Subject: [PATCH 3/3] fdts: stm32mp157a-msmp1evk: regulator vdd1_lpddr not in
+ sink-source mode
+
+The regulatar vdd1_lpddr is not used in sink-source mode for the
+LPDDR4 memory. This property is actually not used by the code but we
+remove it to avoid confusion.
+---
+ fdts/stm32mp157a-msmp1evk.dts | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/fdts/stm32mp157a-msmp1evk.dts b/fdts/stm32mp157a-msmp1evk.dts
+index cb78897b1..3913814d3 100644
+--- a/fdts/stm32mp157a-msmp1evk.dts
++++ b/fdts/stm32mp157a-msmp1evk.dts
+@@ -143,7 +143,6 @@
+ 				regulator-name = "vdd1_lpddr";
+ 				regulator-min-microvolt = <1800000>;
+ 				regulator-max-microvolt = <1800000>;
+-				st,regulator-sink-source;
+ 			};
+ 
+ 			vdd_usb: ldo4 {
+-- 
+2.30.2
+
