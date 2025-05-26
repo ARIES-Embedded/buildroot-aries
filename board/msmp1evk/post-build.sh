@@ -20,20 +20,19 @@ board_name()
 main()
 {
 	local BOARD_NAME="$(board_name)"
-	local GENIMAGE_CFG="$(mktemp --suffix genimage.cfg)"
-	local GENIMAGE_TMP="${BUILD_DIR}/genimage.tmp"
+	local GENIMAGE_CFG="${BUILD_DIR}/genimage.cfg"
 	local BOARD_PATH=${BR2_EXTERNAL_ARIES_PATH}/board/msmp1evk""
 
 	mkdir -p "$TARGET_DIR/boot/extlinux/"
 	sed -e "s/%BOARD_NAME%/${BOARD_NAME}/" \
 		${BOARD_PATH}/extlinux.conf.template > "$TARGET_DIR/boot/extlinux/extlinux.conf"
 
+	# Generate genimage configuration file to be used later by
+	# via confguration options:
+	# BR2_ROOTFS_POST_IMAGE_SCRIPT="support/scripts/genimage.sh"
+	# BR2_ROOTFS_POST_SCRIPT_ARGS="-c $(BUILD_DIR)/genimage.cfg"
 	sed -e "s/%BOARD_NAME%/${BOARD_NAME}/" \
 		${BOARD_PATH}/genimage.cfg.template > ${GENIMAGE_CFG}
-
-	support/scripts/genimage.sh -c ${GENIMAGE_CFG}
-
-	rm -f ${GENIMAGE_CFG}
 
 	exit $?
 }
