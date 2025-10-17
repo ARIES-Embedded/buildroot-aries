@@ -1,7 +1,7 @@
-From 99d7b7820431120fe2d3e026451912fe238d0222 Mon Sep 17 00:00:00 2001
+From 00aa19711ad1f7a63912b44a92db8a7986cafaad Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Fri, 5 May 2023 20:22:36 +0200
-Subject: [PATCH 2/3] fdts: stm32mp1: introduce Aries Embedded MSMP1 Modules on
+Subject: [PATCH 2/4] fdts: stm32mp1: introduce Aries Embedded MSMP1 Modules on
  MSMP1EVK
 
 Currently two modules are available. The MSMP157A with 1x8Gb LPDDR3
@@ -924,5 +924,5 @@ index 000000000..c06507702
 +	status = "okay";
 +};
 -- 
-2.30.2
+2.34.1
 

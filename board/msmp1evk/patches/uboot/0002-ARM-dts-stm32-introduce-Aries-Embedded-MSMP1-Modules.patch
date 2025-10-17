@@ -1,7 +1,7 @@
-From ed80c6b0c019b8579b8684cc59b2e18464a14a4e Mon Sep 17 00:00:00 2001
+From 5cbf2cc8f3c56c7e2bba8d9ce82e78e3afe6657a Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Sat, 6 May 2023 10:52:10 +0200
-Subject: [PATCH 2/3] ARM: dts: stm32: introduce Aries Embedded MSMP1 Modules
+Subject: [PATCH 2/4] ARM: dts: stm32: introduce Aries Embedded MSMP1 Modules
  on MSMP1EVK
 
 Add support for the ARIES Embedded System on Modules (SoM) MSMP1 on
@@ -39,7 +39,7 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  create mode 100644 configs/stm32mp157c-msmp1evk_defconfig
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index c160e884bf..cf7daf9644 100644
+index c160e884bf6..cf7daf96447 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
 @@ -1238,12 +1238,14 @@ dtb-$(CONFIG_STM32MP15x) += \
@@ -59,7 +59,7 @@ index c160e884bf..cf7daf9644 100644
  	stm32mp15xx-dhcom-pdk2.dtb \
 diff --git a/arch/arm/dts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi b/arch/arm/dts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi
 new file mode 100644
-index 0000000000..08a4bd8384
+index 00000000000..08a4bd83846
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp15-lpddr3-1x8Gb-1066-binG.dtsi
 @@ -0,0 +1,107 @@
@@ -172,7 +172,7 @@ index 0000000000..08a4bd8384
 +#include "stm32mp15-ddr.dtsi"
 diff --git a/arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi b/arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi
 new file mode 100644
-index 0000000000..a3cd4c5cc7
+index 00000000000..e38fd5b67b1
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi
 @@ -0,0 +1,234 @@
@@ -228,8 +228,8 @@ index 0000000000..a3cd4c5cc7
 +			label = "heartbeat";
 +			gpios = <&gpioa 13 GPIO_ACTIVE_LOW>;
 +			linux,default-trigger = "heartbeat";
-+         		default-state = "off";
-+ 		};
++			default-state = "off";
++		};
 +
 +		led-red {
 +			label = "error";
@@ -412,7 +412,7 @@ index 0000000000..a3cd4c5cc7
 +};
 diff --git a/arch/arm/dts/stm32mp157a-msmp1evk.dts b/arch/arm/dts/stm32mp157a-msmp1evk.dts
 new file mode 100644
-index 0000000000..d01932c85a
+index 00000000000..d01932c85af
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157a-msmp1evk.dts
 @@ -0,0 +1,461 @@
@@ -879,7 +879,7 @@ index 0000000000..d01932c85a
 +};
 diff --git a/arch/arm/dts/stm32mp157c-msmp1evk-u-boot.dtsi b/arch/arm/dts/stm32mp157c-msmp1evk-u-boot.dtsi
 new file mode 100644
-index 0000000000..0d99c87e25
+index 00000000000..0d99c87e252
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157c-msmp1evk-u-boot.dtsi
 @@ -0,0 +1,238 @@
@@ -1123,7 +1123,7 @@ index 0000000000..0d99c87e25
 +};
 diff --git a/arch/arm/dts/stm32mp157c-msmp1evk.dts b/arch/arm/dts/stm32mp157c-msmp1evk.dts
 new file mode 100644
-index 0000000000..4737253d4e
+index 00000000000..4737253d4e5
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157c-msmp1evk.dts
 @@ -0,0 +1,494 @@
@@ -1623,7 +1623,7 @@ index 0000000000..4737253d4e
 +};
 diff --git a/configs/stm32mp157a-msmp1evk_defconfig b/configs/stm32mp157a-msmp1evk_defconfig
 new file mode 100644
-index 0000000000..504cccab7c
+index 00000000000..504cccab7c2
 --- /dev/null
 +++ b/configs/stm32mp157a-msmp1evk_defconfig
 @@ -0,0 +1,176 @@
@@ -1805,7 +1805,7 @@ index 0000000000..504cccab7c
 +CONFIG_LMB_RESERVED_REGIONS=16
 diff --git a/configs/stm32mp157c-msmp1evk_defconfig b/configs/stm32mp157c-msmp1evk_defconfig
 new file mode 100644
-index 0000000000..c1b1e88032
+index 00000000000..c1b1e880328
 --- /dev/null
 +++ b/configs/stm32mp157c-msmp1evk_defconfig
 @@ -0,0 +1,176 @@
@@ -1986,5 +1986,5 @@ index 0000000000..c1b1e88032
 +CONFIG_LMB_MEMORY_REGIONS=2
 +CONFIG_LMB_RESERVED_REGIONS=16
 -- 
-2.30.2
+2.34.1
 

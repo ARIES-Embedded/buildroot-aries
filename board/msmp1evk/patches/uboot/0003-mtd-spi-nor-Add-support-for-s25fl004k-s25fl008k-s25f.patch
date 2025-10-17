@@ -1,7 +1,7 @@
-From 9896f17271ff167439f927fefd35edeec4304ec0 Mon Sep 17 00:00:00 2001
+From e16478091c1d90a0bb9608389d12bf9424e88e0c Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Tue, 13 May 2025 20:11:35 +0200
-Subject: [PATCH 3/3] mtd: spi-nor: Add support for s25fl004k, s25fl008k,
+Subject: [PATCH 3/4] mtd: spi-nor: Add support for s25fl004k, s25fl008k,
  s25fl016k and s25fl064k
 
 The settings are derived from the Linux kernel.
@@ -12,7 +12,7 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  1 file changed, 4 insertions(+)
 
 diff --git a/drivers/mtd/spi/spi-nor-ids.c b/drivers/mtd/spi/spi-nor-ids.c
-index 3f8b796789..2cac6983da 100644
+index 3f8b7967893..2cac6983da2 100644
 --- a/drivers/mtd/spi/spi-nor-ids.c
 +++ b/drivers/mtd/spi/spi-nor-ids.c
 @@ -340,6 +340,10 @@ const struct flash_info spi_nor_ids[] = {
@@ -27,5 +27,5 @@ index 3f8b796789..2cac6983da 100644
  	{ INFO("s25fl164k",  0x014017,      0,  64 * 1024, 128, SECT_4K) },
  	{ INFO("s25fl208k",  0x014014,      0,  64 * 1024,  16, SECT_4K | SPI_NOR_DUAL_READ) },
 -- 
-2.30.2
+2.34.1
 

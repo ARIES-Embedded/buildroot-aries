@@ -1,7 +1,7 @@
-From a80913ca2e8e512fa63d496cd891b3c075734949 Mon Sep 17 00:00:00 2001
+From 68e496ded585db774825d9d726614fcd3a0ca5fd Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Mon, 26 May 2025 16:23:33 +0200
-Subject: [PATCH 3/3] fdts: stm32mp157a-msmp1evk: regulator vdd1_lpddr not in
+Subject: [PATCH 3/4] fdts: stm32mp157a-msmp1evk: regulator vdd1_lpddr not in
  sink-source mode
 
 The regulatar vdd1_lpddr is not used in sink-source mode for the
@@ -24,5 +24,5 @@ index cb78897b1..3913814d3 100644
  
  			vdd_usb: ldo4 {
 -- 
-2.30.2
+2.34.1
 
