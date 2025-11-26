@@ -1,7 +1,7 @@
 From f1c21d975f3bf970c897b8928f00d7072f86eb84 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Fri, 17 Oct 2025 13:32:03 +0200
-Subject: [PATCH 4/4] ARM: dts: stm32mp157c-msmp1evk: switch to 8Gb DDR3L
+Subject: [PATCH 4/5] ARM: dts: stm32mp157c-msmp1evk: switch to 8Gb DDR3L
  memory present on the BAA
 
 Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>

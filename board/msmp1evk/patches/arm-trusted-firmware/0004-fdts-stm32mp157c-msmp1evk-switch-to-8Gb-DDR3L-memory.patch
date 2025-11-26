@@ -1,7 +1,7 @@
 From 0da5baa455b8a0f25b7cde67691934a59d57786f Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Fri, 17 Oct 2025 13:08:14 +0200
-Subject: [PATCH 4/4] fdts: stm32mp157c-msmp1evk: switch to 8Gb DDR3L memory
+Subject: [PATCH 4/5] fdts: stm32mp157c-msmp1evk: switch to 8Gb DDR3L memory
  present on the BAA
 
 ---

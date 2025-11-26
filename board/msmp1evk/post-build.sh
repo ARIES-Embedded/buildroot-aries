@@ -10,11 +10,7 @@ board_name()
 {
 	local ATF_VARIABLES="$(sed -n 's/^BR2_TARGET_ARM_TRUSTED_FIRMWARE_ADDITIONAL_VARIABLES="\([\/a-zA-Z0-9_=. \-]*\)"$/\1/p' ${BR2_CONFIG})"
 
-	if grep -Eq "DTB_FILE_NAME=stm32mp157a-msmp1evk.dtb" <<< ${ATF_VARIABLES}; then
-		echo "stm32mp157a-msmp1evk"
-	elif grep -Eq "DTB_FILE_NAME=stm32mp157c-msmp1evk.dtb" <<< ${ATF_VARIABLES}; then
-		echo "stm32mp157c-msmp1evk"
-	fi
+	grep -Po 'DTB_FILE_NAME=\K[a-z0-9-]*' <<< ${ATF_VARIABLES}
 }
 
 main()
@@ -31,6 +27,7 @@ main()
 	# via confguration options:
 	# BR2_ROOTFS_POST_IMAGE_SCRIPT="support/scripts/genimage.sh"
 	# BR2_ROOTFS_POST_SCRIPT_ARGS="-c $(BUILD_DIR)/genimage.cfg"
+	echo "BOARD_NAME=$BOARD_NAME"
 	sed -e "s/%BOARD_NAME%/${BOARD_NAME}/" \
 		${BOARD_PATH}/genimage.cfg.template > ${GENIMAGE_CFG}
 

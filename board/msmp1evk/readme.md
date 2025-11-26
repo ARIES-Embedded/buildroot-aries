@@ -8,12 +8,31 @@ This README describes how to build and install the firmware for the
 ARIES Embedded System on Module (SoM) [MSMP1][1] and the Evaluation Kit
 (EVK) [MSMP1EVK][2].
 
-
 Build
 -----
 
 How to build the BSP images is described in the [README.md][3] file in the
 top directory of this repository.
+
+Currently, the folloiwng hardware options and configs are supported:
+    
+    A0A   : STM32MP157A, STPMIC1A, 512 MB DDR3L
+            stm32mp157a-msmp1evk-a0a_defconfig
+    
+    BAA   : STM32MP157A, STPMIC1A, 1 GB DDR3L
+            stm32mp157a-msmp1evk-baa_defconfig
+            stm32mp157a-msmp1evk-baa_qt5_defconfig
+    
+    BBAI  : STM32MP157C, STPMIC1A, 1 GB DDR3L
+            stm32mp157c-msmp1evk-bbai_defconfig
+            stm32mp157c-msmp1evk-bbai_qt5_defconfig
+    
+    BAA18 : STM32MP157A, STPMIC1B, 1 GB DDR3L
+            stm32mp157a-msmp1evk-baa18_defconfig
+    
+    BAA v3: STM32MP157A, STPMIC1A, 1 GB LPDDR4
+            stm32mp157a-msmp1evk-baa-v3_defconfig
+            stm32mp157a-msmp1evk-baa-v3_qt5_defconfig
 
 
 SPI-NOR and SDcard/eMMC Layout

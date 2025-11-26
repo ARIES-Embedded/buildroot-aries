@@ -1,0 +1,1057 @@
+From c7a4e2b8c87c4c0f1783ea4ad86d68ae9c14bcda Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@aries-embedded.de>
+Date: Thu, 16 Oct 2025 20:14:13 +0200
+Subject: [PATCH 6/6] ARM: dts: stm32mp157x-msmp1evk: define separate dts files
+ for the various options
+
+Currently, there are the folloiwng hardware options, which require slightly
+different device tree source files:
+
+A0A   : STM32MP157A, STPMIC1A, 512 MB DDR3L
+        stm32mp157a-msmp1evk-a0a.dts
+
+BAA   : STM32MP157A, STPMIC1A, 1 GB DDR3L
+        stm32mp157a-msmp1evk-baa.dts
+        stm32mp157a-msmp1evk-baa-rgb-panel.dts
+	stm32mp157a-msmp1testadap-baa-rgb-panel.dts
+
+BBAI  : STM32MP157C, STPMIC1A, 1 GB DDR3L
+        stm32mp157c-msmp1evk-bbai.dts
+        stm32mp157c-msmp1evk-bbai-rgb-panel.dts
+        stm32mp157c-msmp1testadap-baa-rgb-panel.dts
+
+BAA18 : STM32MP157A, STPMIC1B, 1 GB DDR3L
+        stm32mp157a-msmp1evk-baa18.dts
+
+BAA v3: STM32MP157A, STPMIC1A, 1 GB LPDDR4
+        stm32mp157a-msmp1evk-baa-v3.dts
+        stm32mp157a-msmp1evk-baa-v3-rgb-panel.dts
+
+Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
+---
+ arch/arm/boot/dts/Makefile                    |  15 +-
+ ...mp1.dtsi => stm32mp157a-msmp1-baa-v3.dtsi} |   4 +-
+ .../arm/boot/dts/stm32mp157a-msmp1evk-a0a.dts |  22 +++
+ .../stm32mp157a-msmp1evk-baa-rgb-panel.dts    |  23 +++
+ ...stm32mp157a-msmp1evk-baa-v3-rgb-panel.dts} |   5 +-
+ .../boot/dts/stm32mp157a-msmp1evk-baa-v3.dts  |  13 ++
+ ....dtsi => stm32mp157a-msmp1evk-baa-v3.dtsi} |   2 +-
+ .../arm/boot/dts/stm32mp157a-msmp1evk-baa.dts |  22 +++
+ .../boot/dts/stm32mp157a-msmp1evk-baa18.dts   |  22 +++
+ arch/arm/boot/dts/stm32mp157a-msmp1evk.dts    |  12 --
+ ...tm32mp157a-msmp1testadap-baa-rgb-panel.dts |  23 +++
+ .../stm32mp157c-msmp1evk-bbai-rgb-panel.dts   |  24 +++
+ .../boot/dts/stm32mp157c-msmp1evk-bbai.dts    |  23 +++
+ arch/arm/boot/dts/stm32mp157c-msmp1evk.dts    |  15 --
+ ...m32mp157c-msmp1testadap-bbai-rgb-panel.dts |  24 +++
+ .../boot/dts/stm32mp157x-msmp1-stpmic1a.dtsi  | 162 +++++++++++++++++
+ .../boot/dts/stm32mp157x-msmp1-stpmic1b.dtsi  | 162 +++++++++++++++++
+ ...157c-msmp1.dtsi => stm32mp157x-msmp1.dtsi} | 170 +-----------------
+ ...ts => stm32mp157x-msmp1evk-rgb-panel.dtsi} |   8 +-
+ ...smp1evk.dtsi => stm32mp157x-msmp1evk.dtsi} |   8 +-
+ ... stm32mp157x-msmp1testadap-rgb-panel.dtsi} |   7 +-
+ 21 files changed, 543 insertions(+), 223 deletions(-)
+ rename arch/arm/boot/dts/{stm32mp157a-msmp1.dtsi => stm32mp157a-msmp1-baa-v3.dtsi} (98%)
+ create mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1evk-a0a.dts
+ create mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-rgb-panel.dts
+ rename arch/arm/boot/dts/{stm32mp157a-msmp1evk-rgb-panel.dts => stm32mp157a-msmp1evk-baa-v3-rgb-panel.dts} (87%)
+ create mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-v3.dts
+ rename arch/arm/boot/dts/{stm32mp157a-msmp1evk.dtsi => stm32mp157a-msmp1evk-baa-v3.dtsi} (97%)
+ create mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1evk-baa.dts
+ create mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts
+ delete mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1evk.dts
+ create mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1testadap-baa-rgb-panel.dts
+ create mode 100644 arch/arm/boot/dts/stm32mp157c-msmp1evk-bbai-rgb-panel.dts
+ create mode 100644 arch/arm/boot/dts/stm32mp157c-msmp1evk-bbai.dts
+ delete mode 100644 arch/arm/boot/dts/stm32mp157c-msmp1evk.dts
+ create mode 100644 arch/arm/boot/dts/stm32mp157c-msmp1testadap-bbai-rgb-panel.dts
+ create mode 100644 arch/arm/boot/dts/stm32mp157x-msmp1-stpmic1a.dtsi
+ create mode 100644 arch/arm/boot/dts/stm32mp157x-msmp1-stpmic1b.dtsi
+ rename arch/arm/boot/dts/{stm32mp157c-msmp1.dtsi => stm32mp157x-msmp1.dtsi} (55%)
+ rename arch/arm/boot/dts/{stm32mp157c-msmp1evk-rgb-panel.dts => stm32mp157x-msmp1evk-rgb-panel.dtsi} (87%)
+ rename arch/arm/boot/dts/{stm32mp157c-msmp1evk.dtsi => stm32mp157x-msmp1evk.dtsi} (96%)
+ rename arch/arm/boot/dts/{stm32mp157c-msmp1testadap-rgb-panel.dts => stm32mp157x-msmp1testadap-rgb-panel.dtsi} (89%)
+
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index 7ad28e17db935..e0b86f6b62152 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -1227,8 +1227,13 @@ dtb-$(CONFIG_ARCH_STM32) += \
+ 	stm32mp157a-iot-box.dtb \
+ 	stm32mp157a-microgea-stm32mp1-microdev2.0.dtb \
+ 	stm32mp157a-microgea-stm32mp1-microdev2.0-of7.dtb \
+-	stm32mp157a-msmp1evk.dtb \
+-	stm32mp157a-msmp1evk-rgb-panel.dtb \
++	stm32mp157a-msmp1evk-a0a.dtb \
++	stm32mp157a-msmp1evk-baa.dtb \
++	stm32mp157a-msmp1evk-baa-rgb-panel.dtb \
++	stm32mp157a-msmp1testadap-baa-rgb-panel.dtb \
++	stm32mp157a-msmp1evk-baa18.dtb \
++	stm32mp157a-msmp1evk-baa-v3.dtb \
++	stm32mp157a-msmp1evk-baa-v3-rgb-panel.dtb \
+ 	stm32mp157a-icore-stm32mp1-ctouch2.dtb \
+ 	stm32mp157a-icore-stm32mp1-ctouch2-of10.dtb \
+ 	stm32mp157a-icore-stm32mp1-edimm2.2.dtb \
+@@ -1243,9 +1248,9 @@ dtb-$(CONFIG_ARCH_STM32) += \
+ 	stm32mp157c-ev1.dtb \
+ 	stm32mp157c-ev1-scmi.dtb \
+ 	stm32mp157c-lxa-mc1.dtb \
+-	stm32mp157c-msmp1evk.dtb \
+-	stm32mp157c-msmp1evk-rgb-panel.dtb \
+-	stm32mp157c-msmp1testadap-rgb-panel.dtb \
++	stm32mp157c-msmp1evk-bbai.dtb \
++	stm32mp157c-msmp1evk-bbai-rgb-panel.dtb \
++	stm32mp157c-msmp1testadap-bbai-rgb-panel.dtb \
+ 	stm32mp157c-odyssey.dtb
+ dtb-$(CONFIG_MACH_SUN4I) += \
+ 	sun4i-a10-a1000.dtb \
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1.dtsi b/arch/arm/boot/dts/stm32mp157a-msmp1-baa-v3.dtsi
+similarity index 98%
+rename from arch/arm/boot/dts/stm32mp157a-msmp1.dtsi
+rename to arch/arm/boot/dts/stm32mp157a-msmp1-baa-v3.dtsi
+index adec16197daec..a3056ad877bab 100644
+--- a/arch/arm/boot/dts/stm32mp157a-msmp1.dtsi
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1-baa-v3.dtsi
+@@ -13,8 +13,8 @@
+ #include <dt-bindings/mfd/st,stpmic1.h>
+ 
+ / {
+-	model = "Aries Embedded STM32MP157a MSMP1 SoM";
+-	compatible = "st,stm32mp157a-msmp1", "st,stm32mp157";
++	model = "Aries Embedded STM32MP157A BAA v3 MSMP1 SoM";
++	compatible = "st,stm32mp157a-msmp1-baa-v3", "st,stm32mp157";
+ 
+ 	memory@c0000000 {
+ 		device_type = "memory";
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk-a0a.dts b/arch/arm/boot/dts/stm32mp157a-msmp1evk-a0a.dts
+new file mode 100644
+index 0000000000000..0840bb4e5fb33
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1evk-a0a.dts
+@@ -0,0 +1,22 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
++ */
++
++/dts-v1/;
++
++#include "stm32mp157.dtsi"
++#include "stm32mp15-pinctrl.dtsi"
++#include "stm32mp15xxaa-pinctrl.dtsi"
++#include "stm32mp157x-msmp1evk.dtsi"
++#include "stm32mp157x-msmp1-stpmic1a.dtsi"
++
++/ {
++	model = "Aries Embedded STM32MP157C MSMP1-A0A SoM on EVK";
++	compatible = "aries,stm32mp157a-msmp1evk-a0a", "st,stm32mp157";
++
++	memory@c0000000 {
++		device_type = "memory";
++		reg = <0xC0000000 0x20000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-rgb-panel.dts b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-rgb-panel.dts
+new file mode 100644
+index 0000000000000..fc26a69872261
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-rgb-panel.dts
+@@ -0,0 +1,23 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
++ */
++
++/dts-v1/;
++
++#include "stm32mp157.dtsi"
++#include "stm32mp15-pinctrl.dtsi"
++#include "stm32mp15xxaa-pinctrl.dtsi"
++#include "stm32mp157x-msmp1-stpmic1a.dtsi"
++#include "stm32mp157x-msmp1evk-rgb-panel.dtsi"
++#include "stm32mp157x-msmp1evk.dtsi"
++
++/ {
++	model = "Aries Embedded STM32MP157A MSMP1 BAA on EVK with RGB panel";
++	compatible = "aries,stm32mp157a-msmp1evk-baa", "st,stm32mp157";
++
++	memory@c0000000 {
++		device_type = "memory";
++		reg = <0xC0000000 0x40000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk-rgb-panel.dts b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-v3-rgb-panel.dts
+similarity index 87%
+rename from arch/arm/boot/dts/stm32mp157a-msmp1evk-rgb-panel.dts
+rename to arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-v3-rgb-panel.dts
+index ace97d90f8c69..57547826098a8 100644
+--- a/arch/arm/boot/dts/stm32mp157a-msmp1evk-rgb-panel.dts
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-v3-rgb-panel.dts
+@@ -5,10 +5,11 @@
+ 
+ /dts-v1/;
+ 
+-#include "stm32mp157a-msmp1evk.dtsi"
++#include "stm32mp157a-msmp1-baa-v3.dtsi"
+ 
+ / {
+-	model = "Aries Embedded STM32MP157A MSMP1 SoM on EVK with RGB panel";
++	model = "Aries Embedded STM32MP157A MSMP1 BAA v3 SoM on EVK with RGB panel";
++	compatible = "st,stm32mp157a-msmp1evk-baa-v3", "st,stm32mp157";
+ 
+ 	backlight: backlight {
+ 		compatible = "pwm-backlight";
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-v3.dts b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-v3.dts
+new file mode 100644
+index 0000000000000..f80f747259536
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-v3.dts
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) 2023-2024 Wolfgang Grandegger <wg@aries-embedded.de>
++ */
++
++/dts-v1/;
++
++#include "stm32mp157a-msmp1evk-baa-v3.dtsi"
++
++/ {
++	model = "Aries Embedded STM32MP157A MSMP1 BAA v3 SoM on EVK";
++	compatible = "aries,stm32mp157a-msmp1evk-baa-v3", "st,stm32mp157";
++};
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk.dtsi b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-v3.dtsi
+similarity index 97%
+rename from arch/arm/boot/dts/stm32mp157a-msmp1evk.dtsi
+rename to arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-v3.dtsi
+index 035d951dbdce7..e30c4c3ec4ef2 100644
+--- a/arch/arm/boot/dts/stm32mp157a-msmp1evk.dtsi
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-v3.dtsi
+@@ -5,7 +5,7 @@
+ 
+ /dts-v1/;
+ 
+-#include "stm32mp157a-msmp1.dtsi"
++#include "stm32mp157a-msmp1-baa-v3.dtsi"
+ 
+ / {
+ 	compatible = "st,stm32mp157a-msmp1evk",
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa.dts b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa.dts
+new file mode 100644
+index 0000000000000..eb4d65702f436
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa.dts
+@@ -0,0 +1,22 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
++ */
++
++/dts-v1/;
++
++#include "stm32mp157.dtsi"
++#include "stm32mp15-pinctrl.dtsi"
++#include "stm32mp15xxaa-pinctrl.dtsi"
++#include "stm32mp157x-msmp1evk.dtsi"
++#include "stm32mp157x-msmp1-stpmic1a.dtsi"
++
++/ {
++	model = "Aries Embedded STM32MP157A MSMP1 BAA on EVK";
++	compatible = "aries,stm32mp157a-msmp1evk-baa", "st,stm32mp157";
++
++	memory@c0000000 {
++		device_type = "memory";
++		reg = <0xC0000000 0x40000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts
+new file mode 100644
+index 0000000000000..2428a023308f0
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts
+@@ -0,0 +1,22 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
++ */
++
++/dts-v1/;
++
++#include "stm32mp157.dtsi"
++#include "stm32mp15-pinctrl.dtsi"
++#include "stm32mp15xxaa-pinctrl.dtsi"
++#include "stm32mp157x-msmp1evk.dtsi"
++#include "stm32mp157x-msmp1-stpmic1b.dtsi"
++
++/ {
++	model = "Aries Embedded STM32MP157A MSMP1 BAA18 on EVK";
++	compatible = "aries,stm32mp157a-msmp1evk-baa18", "st,stm32mp157";
++
++	memory@c0000000 {
++		device_type = "memory";
++		reg = <0xC0000000 0x40000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk.dts b/arch/arm/boot/dts/stm32mp157a-msmp1evk.dts
+deleted file mode 100644
+index f3ce7ff44181d..0000000000000
+--- a/arch/arm/boot/dts/stm32mp157a-msmp1evk.dts
++++ /dev/null
+@@ -1,12 +0,0 @@
+-// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+-/*
+- * Copyright (C) 2023-2024 Wolfgang Grandegger <wg@aries-embedded.de>
+- */
+-
+-/dts-v1/;
+-
+-#include "stm32mp157a-msmp1evk.dtsi"
+-
+-/ {
+-	model = "Aries Embedded STM32MP157A MSMP1 SoM on EVK";
+-};
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1testadap-baa-rgb-panel.dts b/arch/arm/boot/dts/stm32mp157a-msmp1testadap-baa-rgb-panel.dts
+new file mode 100644
+index 0000000000000..76d409f082e52
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1testadap-baa-rgb-panel.dts
+@@ -0,0 +1,23 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
++ */
++
++/dts-v1/;
++
++#include "stm32mp157.dtsi"
++#include "stm32mp15-pinctrl.dtsi"
++#include "stm32mp15xxaa-pinctrl.dtsi"
++#include "stm32mp157x-msmp1-stpmic1a.dtsi"
++#include "stm32mp157x-msmp1evk.dtsi"
++#include "stm32mp157x-msmp1testadap-rgb-panel.dtsi"
++
++/ {
++	model = "Aries Embedded STM32MP157A MSMP1 BAA on TESTADAP with RGB panel";
++	compatible = "aries,stm32mp157a-msmp1evk-baa", "st,stm32mp157";
++
++	memory@c0000000 {
++		device_type = "memory";
++		reg = <0xC0000000 0x40000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1evk-bbai-rgb-panel.dts b/arch/arm/boot/dts/stm32mp157c-msmp1evk-bbai-rgb-panel.dts
+new file mode 100644
+index 0000000000000..1e28898bb53ca
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157c-msmp1evk-bbai-rgb-panel.dts
+@@ -0,0 +1,24 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
++ */
++
++/dts-v1/;
++
++#include "stm32mp157.dtsi"
++#include "stm32mp15xc.dtsi"
++#include "stm32mp15-pinctrl.dtsi"
++#include "stm32mp15xxaa-pinctrl.dtsi"
++#include "stm32mp157x-msmp1-stpmic1a.dtsi"
++#include "stm32mp157x-msmp1evk.dtsi"
++#include "stm32mp157x-msmp1evk-rgb-panel.dtsi"
++
++/ {
++	model = "Aries Embedded STM32MP157C MSMP1 BBAI on EVK with RGB panel";
++	compatible = "aries,stm32mp157c-msmp1evk-bbai", "st,stm32mp157";
++
++	memory@c0000000 {
++		device_type = "memory";
++		reg = <0xC0000000 0x40000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1evk-bbai.dts b/arch/arm/boot/dts/stm32mp157c-msmp1evk-bbai.dts
+new file mode 100644
+index 0000000000000..86e012f748812
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157c-msmp1evk-bbai.dts
+@@ -0,0 +1,23 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
++ */
++
++/dts-v1/;
++
++#include "stm32mp157.dtsi"
++#include "stm32mp15xc.dtsi"
++#include "stm32mp15-pinctrl.dtsi"
++#include "stm32mp15xxaa-pinctrl.dtsi"
++#include "stm32mp157x-msmp1evk.dtsi"
++#include "stm32mp157x-msmp1-stpmic1a.dtsi"
++
++/ {
++	model = "Aries Embedded STM32MP157C MSMP1 BBAI on EVK";
++	compatible = "aries,stm32mp157c-msmp1evk-bbai", "st,stm32mp157";
++
++	memory@c0000000 {
++		device_type = "memory";
++		reg = <0xC0000000 0x40000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1evk.dts b/arch/arm/boot/dts/stm32mp157c-msmp1evk.dts
+deleted file mode 100644
+index d7ab47fc7c1cd..0000000000000
+--- a/arch/arm/boot/dts/stm32mp157c-msmp1evk.dts
++++ /dev/null
+@@ -1,15 +0,0 @@
+-// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+-/*
+- * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
+- */
+-
+-/dts-v1/;
+-
+-// The OSM test adapter board is sligtly different than the OSMEVK
+-//#define OSM_TESTADAPTER 1
+-
+-#include "stm32mp157c-msmp1evk.dtsi"
+-
+-/ {
+-	model = "Aries Embedded STM32MP157C MSMP1 SoM on EVK";
+-};
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1testadap-bbai-rgb-panel.dts b/arch/arm/boot/dts/stm32mp157c-msmp1testadap-bbai-rgb-panel.dts
+new file mode 100644
+index 0000000000000..912a88bf87d51
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157c-msmp1testadap-bbai-rgb-panel.dts
+@@ -0,0 +1,24 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
++ */
++
++/dts-v1/;
++
++#include "stm32mp157.dtsi"
++#include "stm32mp15xc.dtsi"
++#include "stm32mp15-pinctrl.dtsi"
++#include "stm32mp15xxaa-pinctrl.dtsi"
++#include "stm32mp157x-msmp1evk.dtsi"
++#include "stm32mp157x-msmp1testadap-rgb-panel.dtsi"
++#include "stm32mp157x-msmp1-stpmic1a.dtsi"
++
++/ {
++	model = "Aries Embedded STM32MP157C MSMP1 BBAI on TESTADAP with RGB panel";
++	compatible = "aries,stm32mp157c-msmp1evk-bbai", "st,stm32mp157";
++
++	memory@c0000000 {
++		device_type = "memory";
++		reg = <0xC0000000 0x40000000>;
++	};
++};
+diff --git a/arch/arm/boot/dts/stm32mp157x-msmp1-stpmic1a.dtsi b/arch/arm/boot/dts/stm32mp157x-msmp1-stpmic1a.dtsi
+new file mode 100644
+index 0000000000000..c89fac8d60ba0
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157x-msmp1-stpmic1a.dtsi
+@@ -0,0 +1,162 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) STMicroelectronics 2017 - All Rights Reserved
++ * Author: Ludovic Barre <ludovic.barre@st.com> for STMicroelectronics.
++ */
++
++#include <dt-bindings/mfd/st,stpmic1.h>
++
++&i2c4 {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&i2c4_pins_a>;
++	pinctrl-1 = <&i2c4_sleep_pins_a>;
++	i2c-scl-rising-time-ns = <185>;
++	i2c-scl-falling-time-ns = <20>;
++	clock-frequency = <400000>;
++	status = "okay";
++	/* spare dmas for other usage */
++	/delete-property/dmas;
++	/delete-property/dma-names;
++
++	pmic: stpmic@33 {
++		compatible = "st,stpmic1";
++		reg = <0x33>;
++		interrupts-extended = <&gpioa 0 IRQ_TYPE_EDGE_FALLING>;
++		interrupt-controller;
++		#interrupt-cells = <2>;
++		status = "okay";
++
++		regulators {
++			compatible = "st,stpmic1-regulators";
++			buck1-supply = <&vin>;
++			buck2-supply = <&vin>;
++			buck3-supply = <&vin>;
++			buck4-supply = <&vin>;
++			ldo1-supply = <&vin>;
++			ldo2-supply = <&vin>;
++			ldo3-supply = <&vdd_ddr>;
++			ldo4-supply = <&vin>;
++			ldo5-supply = <&vin>;
++			ldo6-supply = <&vin>;
++			vref_ddr-supply = <&vin>;
++			boost-supply = <&vin>;
++			pwr_sw1-supply = <&bst_out>;
++			pwr_sw2-supply = <&bst_out>;
++
++			vddcore: buck1 {
++				regulator-name = "vddcore";
++				regulator-min-microvolt = <1200000>;
++				regulator-max-microvolt = <1350000>;
++				regulator-always-on;
++				regulator-initial-mode = <0>;
++				regulator-over-current-protection;
++			};
++
++			vdd_ddr: buck2 {
++				regulator-name = "vdd_ddr";
++				regulator-min-microvolt = <1350000>;
++				regulator-max-microvolt = <1350000>;
++				regulator-always-on;
++				regulator-initial-mode = <0>;
++				regulator-over-current-protection;
++			};
++
++			vdd: buck3 {
++				regulator-name = "vdd";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-always-on;
++				st,mask-reset;
++				regulator-initial-mode = <0>;
++				regulator-over-current-protection;
++			};
++
++			v3v3: buck4 {
++				regulator-name = "v3v3";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-always-on;
++				regulator-over-current-protection;
++				regulator-initial-mode = <0>;
++			};
++
++			vflash: ldo1 {
++				regulator-name = "vflash";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				interrupts = <IT_CURLIM_LDO1 0>;
++			};
++
++			vdda: ldo2 {
++				regulator-name = "vdda";
++				regulator-min-microvolt = <2900000>;
++				regulator-max-microvolt = <2900000>;
++				regulator-boot-on;
++				interrupts = <IT_CURLIM_LDO2 0>;
++			};
++
++			vtt_ddr: ldo3 {
++				regulator-name = "vtt_ddr";
++				regulator-min-microvolt = <500000>;
++				regulator-max-microvolt = <750000>;
++				regulator-always-on;
++				regulator-over-current-protection;
++			};
++
++			vdd_usb: ldo4 {
++				regulator-name = "vdd_usb";
++				interrupts = <IT_CURLIM_LDO4 0>;
++			};
++
++			vdd_sd: ldo5 {
++				regulator-name = "vdd_sd";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				interrupts = <IT_CURLIM_LDO5 0>;
++				regulator-boot-on;
++			};
++
++			v1v8: ldo6 {
++				regulator-name = "v1v8";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				//regulator-always-on;
++				interrupts = <IT_CURLIM_LDO6 0>;
++			};
++
++			vref_ddr: vref_ddr {
++				regulator-name = "vref_ddr";
++				regulator-always-on;
++			};
++
++			bst_out: boost {
++				regulator-name = "bst_out";
++				interrupts = <IT_OCP_BOOST 0>;
++			};
++
++			vbus_otg: pwr_sw1 {
++				regulator-name = "vbus_otg";
++				interrupts = <IT_OCP_OTG 0>;
++			};
++
++			vbus_sw: pwr_sw2 {
++				regulator-name = "vbus_sw";
++				interrupts = <IT_OCP_SWOUT 0>;
++				regulator-active-discharge = <1>;
++			};
++		};
++
++		onkey {
++			compatible = "st,stpmic1-onkey";
++			interrupts = <IT_PONKEY_F 0>, <IT_PONKEY_R 0>;
++			interrupt-names = "onkey-falling", "onkey-rising";
++			power-off-time-sec = <10>;
++			status = "okay";
++		};
++
++		watchdog {
++			compatible = "st,stpmic1-wdt";
++			status = "disabled";
++		};
++	};
++};
+diff --git a/arch/arm/boot/dts/stm32mp157x-msmp1-stpmic1b.dtsi b/arch/arm/boot/dts/stm32mp157x-msmp1-stpmic1b.dtsi
+new file mode 100644
+index 0000000000000..f2bbea909b81f
+--- /dev/null
++++ b/arch/arm/boot/dts/stm32mp157x-msmp1-stpmic1b.dtsi
+@@ -0,0 +1,162 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Copyright (C) STMicroelectronics 2017 - All Rights Reserved
++ * Author: Ludovic Barre <ludovic.barre@st.com> for STMicroelectronics.
++ */
++
++#include <dt-bindings/mfd/st,stpmic1.h>
++
++&i2c4 {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&i2c4_pins_a>;
++	pinctrl-1 = <&i2c4_sleep_pins_a>;
++	i2c-scl-rising-time-ns = <185>;
++	i2c-scl-falling-time-ns = <20>;
++	clock-frequency = <400000>;
++	status = "okay";
++	/* spare dmas for other usage */
++	/delete-property/dmas;
++	/delete-property/dma-names;
++
++	pmic: stpmic@33 {
++		compatible = "st,stpmic1";
++		reg = <0x33>;
++		interrupts-extended = <&gpioa 0 IRQ_TYPE_EDGE_FALLING>;
++		interrupt-controller;
++		#interrupt-cells = <2>;
++		status = "okay";
++
++		regulators {
++			compatible = "st,stpmic1-regulators";
++			buck1-supply = <&vin>;
++			buck2-supply = <&vin>;
++			buck3-supply = <&vin>;
++			buck4-supply = <&vin>;
++			ldo1-supply = <&vin>;
++			ldo2-supply = <&vin>;
++			ldo3-supply = <&vdd_ddr>;
++			ldo4-supply = <&vin>;
++			ldo5-supply = <&vin>;
++			ldo6-supply = <&vin>;
++			vref_ddr-supply = <&vin>;
++			boost-supply = <&vin>;
++			pwr_sw1-supply = <&bst_out>;
++			pwr_sw2-supply = <&bst_out>;
++
++			vddcore: buck1 {
++				regulator-name = "vddcore";
++				regulator-min-microvolt = <1200000>;
++				regulator-max-microvolt = <1350000>;
++				regulator-always-on;
++				regulator-initial-mode = <0>;
++				regulator-over-current-protection;
++			};
++
++			vdd_ddr: buck2 {
++				regulator-name = "vdd_ddr";
++				regulator-min-microvolt = <1350000>;
++				regulator-max-microvolt = <1350000>;
++				regulator-always-on;
++				regulator-initial-mode = <0>;
++				regulator-over-current-protection;
++			};
++
++			vdd: buck3 {
++				regulator-name = "vdd";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-always-on;
++				st,mask-reset;
++				regulator-initial-mode = <0>;
++				regulator-over-current-protection;
++			};
++
++			v3v3: buck4 {
++				regulator-name = "v3v3";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-always-on;
++				regulator-over-current-protection;
++				regulator-initial-mode = <0>;
++			};
++
++			vflash: ldo1 {
++				regulator-name = "vflash";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				interrupts = <IT_CURLIM_LDO1 0>;
++			};
++
++			vdda: ldo2 {
++				regulator-name = "vdda";
++				regulator-min-microvolt = <2900000>;
++				regulator-max-microvolt = <2900000>;
++				regulator-boot-on;
++				interrupts = <IT_CURLIM_LDO2 0>;
++			};
++
++			vtt_ddr: ldo3 {
++				regulator-name = "vtt_ddr";
++				regulator-min-microvolt = <500000>;
++				regulator-max-microvolt = <750000>;
++				regulator-always-on;
++				regulator-over-current-protection;
++			};
++
++			vdd_usb: ldo4 {
++				regulator-name = "vdd_usb";
++				interrupts = <IT_CURLIM_LDO4 0>;
++			};
++
++			vdd_sd: ldo5 {
++				regulator-name = "vdd_sd";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				interrupts = <IT_CURLIM_LDO5 0>;
++				regulator-boot-on;
++			};
++
++			v1v8: ldo6 {
++				regulator-name = "v1v8";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				//regulator-always-on;
++				interrupts = <IT_CURLIM_LDO6 0>;
++			};
++
++			vref_ddr: vref_ddr {
++				regulator-name = "vref_ddr";
++				regulator-always-on;
++			};
++
++			bst_out: boost {
++				regulator-name = "bst_out";
++				interrupts = <IT_OCP_BOOST 0>;
++			};
++
++			vbus_otg: pwr_sw1 {
++				regulator-name = "vbus_otg";
++				interrupts = <IT_OCP_OTG 0>;
++			};
++
++			vbus_sw: pwr_sw2 {
++				regulator-name = "vbus_sw";
++				interrupts = <IT_OCP_SWOUT 0>;
++				regulator-active-discharge = <1>;
++			};
++		};
++
++		onkey {
++			compatible = "st,stpmic1-onkey";
++			interrupts = <IT_PONKEY_F 0>, <IT_PONKEY_R 0>;
++			interrupt-names = "onkey-falling", "onkey-rising";
++			power-off-time-sec = <10>;
++			status = "okay";
++		};
++
++		watchdog {
++			compatible = "st,stpmic1-wdt";
++			status = "disabled";
++		};
++	};
++};
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1.dtsi b/arch/arm/boot/dts/stm32mp157x-msmp1.dtsi
+similarity index 55%
+rename from arch/arm/boot/dts/stm32mp157c-msmp1.dtsi
+rename to arch/arm/boot/dts/stm32mp157x-msmp1.dtsi
+index 974c050f934a9..c5db815d804ab 100644
+--- a/arch/arm/boot/dts/stm32mp157c-msmp1.dtsi
++++ b/arch/arm/boot/dts/stm32mp157x-msmp1.dtsi
+@@ -3,24 +3,13 @@
+  * Copyright (C) STMicroelectronics 2017 - All Rights Reserved
+  * Author: Ludovic Barre <ludovic.barre@st.com> for STMicroelectronics.
+  */
+-/dts-v1/;
+ 
+-#include "stm32mp157.dtsi"
+-#include "stm32mp15xc.dtsi"
+-#include "stm32mp15-pinctrl.dtsi"
+-#include "stm32mp15xxaa-pinctrl.dtsi"
+ #include <dt-bindings/gpio/gpio.h>
+ #include <dt-bindings/leds/common.h>
+-#include <dt-bindings/mfd/st,stpmic1.h>
+ 
+ / {
+-	model = "Aries Embedded STM32MP157c MSMP1 SoM";
+-	compatible = "st,stm32mp157c-msmp1", "st,stm32mp157";
+-
+-	memory@c0000000 {
+-		device_type = "memory";
+-		reg = <0xC0000000 0x20000000>;
+-	};
++	model = "Aries Embedded STM32MP157x MSMP1 SoM";
++	compatible = "st,stm32mp157x-msmp1", "st,stm32mp157";
+ 
+ 	reserved-memory {
+ 		#address-cells = <1>;
+@@ -145,161 +134,6 @@ &hash1 {
+ 	status = "okay";
+ };
+ 
+-&i2c4 {
+-	pinctrl-names = "default", "sleep";
+-	pinctrl-0 = <&i2c4_pins_a>;
+-	pinctrl-1 = <&i2c4_sleep_pins_a>;
+-	i2c-scl-rising-time-ns = <185>;
+-	i2c-scl-falling-time-ns = <20>;
+-	clock-frequency = <400000>;
+-	status = "okay";
+-	/* spare dmas for other usage */
+-	/delete-property/dmas;
+-	/delete-property/dma-names;
+-
+-	pmic: stpmic@33 {
+-		compatible = "st,stpmic1";
+-		reg = <0x33>;
+-		interrupts-extended = <&gpioa 0 IRQ_TYPE_EDGE_FALLING>;
+-		interrupt-controller;
+-		#interrupt-cells = <2>;
+-		status = "okay";
+-
+-		regulators {
+-			compatible = "st,stpmic1-regulators";
+-			buck1-supply = <&vin>;
+-			buck2-supply = <&vin>;
+-			buck3-supply = <&vin>;
+-			buck4-supply = <&vin>;
+-			ldo1-supply = <&vin>;
+-			ldo2-supply = <&vin>;
+-			ldo3-supply = <&vdd_ddr>;
+-			ldo4-supply = <&vin>;
+-			ldo5-supply = <&vin>;
+-			ldo6-supply = <&vin>;
+-			vref_ddr-supply = <&vin>;
+-			boost-supply = <&vin>;
+-			pwr_sw1-supply = <&bst_out>;
+-			pwr_sw2-supply = <&bst_out>;
+-
+-			vddcore: buck1 {
+-				regulator-name = "vddcore";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <1350000>;
+-				regulator-always-on;
+-				regulator-initial-mode = <0>;
+-				regulator-over-current-protection;
+-			};
+-
+-			vdd_ddr: buck2 {
+-				regulator-name = "vdd_ddr";
+-				regulator-min-microvolt = <1350000>;
+-				regulator-max-microvolt = <1350000>;
+-				regulator-always-on;
+-				regulator-initial-mode = <0>;
+-				regulator-over-current-protection;
+-			};
+-
+-			vdd: buck3 {
+-				regulator-name = "vdd";
+-				regulator-min-microvolt = <3300000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-always-on;
+-				st,mask-reset;
+-				regulator-initial-mode = <0>;
+-				regulator-over-current-protection;
+-			};
+-
+-			v3v3: buck4 {
+-				regulator-name = "v3v3";
+-				regulator-min-microvolt = <3300000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-always-on;
+-				regulator-over-current-protection;
+-				regulator-initial-mode = <0>;
+-			};
+-
+-			vflash: ldo1 {
+-				regulator-name = "vflash";
+-				regulator-min-microvolt = <3300000>;
+-				regulator-max-microvolt = <3300000>;
+-				interrupts = <IT_CURLIM_LDO1 0>;
+-			};
+-
+-			vdda: ldo2 {
+-				regulator-name = "vdda";
+-				regulator-min-microvolt = <2900000>;
+-				regulator-max-microvolt = <2900000>;
+-				regulator-boot-on;
+-				interrupts = <IT_CURLIM_LDO2 0>;
+-			};
+-
+-			vtt_ddr: ldo3 {
+-				regulator-name = "vtt_ddr";
+-				regulator-min-microvolt = <500000>;
+-				regulator-max-microvolt = <750000>;
+-				regulator-always-on;
+-				regulator-over-current-protection;
+-			};
+-
+-			vdd_usb: ldo4 {
+-				regulator-name = "vdd_usb";
+-				interrupts = <IT_CURLIM_LDO4 0>;
+-			};
+-
+-			vdd_sd: ldo5 {
+-				regulator-name = "vdd_sd";
+-				regulator-min-microvolt = <3300000>;
+-				regulator-max-microvolt = <3300000>;
+-				interrupts = <IT_CURLIM_LDO5 0>;
+-				regulator-boot-on;
+-			};
+-
+-			v1v8: ldo6 {
+-				regulator-name = "v1v8";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <1800000>;
+-				//regulator-always-on;
+-				interrupts = <IT_CURLIM_LDO6 0>;
+-			};
+-
+-			vref_ddr: vref_ddr {
+-				regulator-name = "vref_ddr";
+-				regulator-always-on;
+-			};
+-
+-			bst_out: boost {
+-				regulator-name = "bst_out";
+-				interrupts = <IT_OCP_BOOST 0>;
+-			};
+-
+-			vbus_otg: pwr_sw1 {
+-				regulator-name = "vbus_otg";
+-				interrupts = <IT_OCP_OTG 0>;
+-			};
+-
+-			vbus_sw: pwr_sw2 {
+-				regulator-name = "vbus_sw";
+-				interrupts = <IT_OCP_SWOUT 0>;
+-				regulator-active-discharge = <1>;
+-			};
+-		};
+-
+-		onkey {
+-			compatible = "st,stpmic1-onkey";
+-			interrupts = <IT_PONKEY_F 0>, <IT_PONKEY_R 0>;
+-			interrupt-names = "onkey-falling", "onkey-rising";
+-			power-off-time-sec = <10>;
+-			status = "okay";
+-		};
+-
+-		watchdog {
+-			compatible = "st,stpmic1-wdt";
+-			status = "disabled";
+-		};
+-	};
+-};
+-
+ &ipcc {
+ 	status = "okay";
+ };
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1evk-rgb-panel.dts b/arch/arm/boot/dts/stm32mp157x-msmp1evk-rgb-panel.dtsi
+similarity index 87%
+rename from arch/arm/boot/dts/stm32mp157c-msmp1evk-rgb-panel.dts
+rename to arch/arm/boot/dts/stm32mp157x-msmp1evk-rgb-panel.dtsi
+index 5d7b93bc0aceb..06277d7efbf93 100644
+--- a/arch/arm/boot/dts/stm32mp157c-msmp1evk-rgb-panel.dts
++++ b/arch/arm/boot/dts/stm32mp157x-msmp1evk-rgb-panel.dtsi
+@@ -1,15 +1,9 @@
+ // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+ /*
+- * Copyright (C) 2023-2024 Wolfgang Grandegger <wg@aries-embedded.de>
++ * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
+  */
+ 
+-/dts-v1/;
+-
+-#include "stm32mp157c-msmp1evk.dtsi"
+-
+ / {
+-	model = "Aries Embedded STM32MP157C MSMP1 SoM on EVK with RGB panel";
+-
+ 	backlight: backlight {
+ 		compatible = "pwm-backlight";
+                 pwms = <&pwm1 0 100000 0>;
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1evk.dtsi b/arch/arm/boot/dts/stm32mp157x-msmp1evk.dtsi
+similarity index 96%
+rename from arch/arm/boot/dts/stm32mp157c-msmp1evk.dtsi
+rename to arch/arm/boot/dts/stm32mp157x-msmp1evk.dtsi
+index bcd1fc940f1e6..f0e4d2bdac570 100644
+--- a/arch/arm/boot/dts/stm32mp157c-msmp1evk.dtsi
++++ b/arch/arm/boot/dts/stm32mp157x-msmp1evk.dtsi
+@@ -3,13 +3,11 @@
+  * Copyright (C) 2023-2024 Wolfgang Grandegger <wg@aries-embedded.de>
+  */
+ 
+-/dts-v1/;
+-
+-#include "stm32mp157c-msmp1.dtsi"
++#include "stm32mp157x-msmp1.dtsi"
+ 
+ / {
+-	compatible = "st,stm32mp157c-msmp1evk",
+-		     "st,stm32mp157c-msmp1", "st,stm32mp157";
++	compatible = "aries,stm32mp157x-msmp1evk", "aries,stm32mp157x-msmp1",
++		     "st,stm32mp157";
+ 
+ 	chosen {
+ 		stdout-path = "serial0:115200n8";
+diff --git a/arch/arm/boot/dts/stm32mp157c-msmp1testadap-rgb-panel.dts b/arch/arm/boot/dts/stm32mp157x-msmp1testadap-rgb-panel.dtsi
+similarity index 89%
+rename from arch/arm/boot/dts/stm32mp157c-msmp1testadap-rgb-panel.dts
+rename to arch/arm/boot/dts/stm32mp157x-msmp1testadap-rgb-panel.dtsi
+index 0f5a477a86ad0..dbb061ff01289 100644
+--- a/arch/arm/boot/dts/stm32mp157c-msmp1testadap-rgb-panel.dts
++++ b/arch/arm/boot/dts/stm32mp157x-msmp1testadap-rgb-panel.dtsi
+@@ -3,14 +3,9 @@
+  * Copyright (C) 2023-2024 Wolfgang Grandegger <wg@aries-embedded.de>
+  */
+ 
+-/dts-v1/;
+-
+-#include "stm32mp157c-msmp1evk.dtsi"
++#include <dt-bindings/gpio/gpio.h>
+ 
+ / {
+-	model = "Aries Embedded STM32MP157C MSMP1 SoM on TESTADAP with RGB panel";
+-
+-
+ 	panel_rgb: panel-rgb {
+ 		compatible = "ampire,am800480r2";
+ 		enable-gpios = <&gpioa 3 GPIO_ACTIVE_HIGH>;
+-- 
+2.34.1
+
