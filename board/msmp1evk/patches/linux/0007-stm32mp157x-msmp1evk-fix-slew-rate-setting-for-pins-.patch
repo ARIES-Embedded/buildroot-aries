@@ -1,0 +1,49 @@
+From d92d9002a73e13e324274e6bbafc311fa29397df Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@aries-embedded.de>
+Date: Mon, 15 Dec 2025 11:18:23 +0100
+Subject: [PATCH 7/7] stm32mp157x-msmp1evk: fix slew-rate setting for pins 4..7
+ for the eMMC
+
+The pinctrl setting for the pins 4..7 for the eMMC in the device-tree
+have not been correct. Actually the following lines are missing:
+
+  slew-rate = <1>;
+  drive-push-pull;
+  bias-pull-up;
+
+With these settings, the double data rate with 1.8V and 50 MHz
+(mmc-ddr-1_8v) does now work for the eMMC, also for the BAA18.
+
+Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
+---
+ arch/arm/boot/dts/stm32mp15-pinctrl.dtsi         | 3 +++
+ arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts | 1 -
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/stm32mp15-pinctrl.dtsi b/arch/arm/boot/dts/stm32mp15-pinctrl.dtsi
+index 23aacc90a1a65..69e88d0314483 100644
+--- a/arch/arm/boot/dts/stm32mp15-pinctrl.dtsi
++++ b/arch/arm/boot/dts/stm32mp15-pinctrl.dtsi
+@@ -1817,6 +1817,9 @@ pins {
+ 				 <STM32_PINMUX('A', 15, AF9)>, /* SDMMC2_D5 */
+ 				 <STM32_PINMUX('C', 6, AF10)>, /* SDMMC2_D6 */
+ 				 <STM32_PINMUX('D', 3, AF9)>; /* SDMMC2_D7 */
++			slew-rate = <1>;
++			drive-push-pull;
++			bias-pull-up;
+ 		};
+ 	};
+ 
+diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts
+index 8bf81031d8fdd..275e3665dd420 100644
+--- a/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts
++++ b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts
+@@ -23,5 +23,4 @@ memory@c0000000 {
+ 
+ &sdmmc2 {
+ 	mmc-ddr-1_8v;
+-	max-frequency = <12500000>;
+ };
+-- 
+2.34.1
+

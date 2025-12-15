@@ -1,7 +1,7 @@
 From 1a2ef9dbf2e8a9c095c68f4952c162253f0597cc Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Wed, 14 May 2025 13:57:39 +0200
-Subject: [PATCH 5/6] ARM: dts: stm32: introduce Aries Embedded MSMP1 Modules
+Subject: [PATCH 5/7] ARM: dts: stm32: introduce Aries Embedded MSMP1 Modules
  on TESTADAP
 
 The OSM Test Adapter does have a slightly different hardware than

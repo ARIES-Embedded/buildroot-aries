@@ -1,0 +1,35 @@
+From 8c2b53faa765187ec16c9fc90211f7452afa7c9c Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@aries-embedded.de>
+Date: Mon, 15 Dec 2025 10:22:52 +0100
+Subject: [PATCH 6/6] stm32mp157x-msmp1evk: fix slew-rate setting for pins 4..7
+ for the eMMC
+
+The pinctrl setting for the pins 4..7 for the eMMC in the device-tree
+have not been correct. Actually the following lines are missing
+
+  slew-rate = <1>;
+  drive-push-pull;
+  bias-pull-up;
+
+Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
+---
+ fdts/stm32mp15-pinctrl.dtsi | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/fdts/stm32mp15-pinctrl.dtsi b/fdts/stm32mp15-pinctrl.dtsi
+index 05a3c4e19..4db311df3 100644
+--- a/fdts/stm32mp15-pinctrl.dtsi
++++ b/fdts/stm32mp15-pinctrl.dtsi
+@@ -224,6 +224,9 @@
+ 				 <STM32_PINMUX('A', 15, AF9)>, /* SDMMC2_D5 */
+ 				 <STM32_PINMUX('C', 6, AF10)>, /* SDMMC2_D6 */
+ 				 <STM32_PINMUX('D', 3, AF9)>; /* SDMMC2_D7 */
++			slew-rate = <1>;
++			drive-push-pull;
++			bias-pull-up;
+ 		};
+ 	};
+ 
+-- 
+2.34.1
+

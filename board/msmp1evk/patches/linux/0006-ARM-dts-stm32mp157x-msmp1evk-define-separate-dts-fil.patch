@@ -1,7 +1,7 @@
-From c7a4e2b8c87c4c0f1783ea4ad86d68ae9c14bcda Mon Sep 17 00:00:00 2001
+From f687e011bab93b87143ad893384df920c2bf994c Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Thu, 16 Oct 2025 20:14:13 +0200
-Subject: [PATCH 6/6] ARM: dts: stm32mp157x-msmp1evk: define separate dts files
+Subject: [PATCH 6/7] ARM: dts: stm32mp157x-msmp1evk: define separate dts files
  for the various options
 
 Currently, there are the folloiwng hardware options, which require slightly
@@ -37,7 +37,7 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  .../boot/dts/stm32mp157a-msmp1evk-baa-v3.dts  |  13 ++
  ....dtsi => stm32mp157a-msmp1evk-baa-v3.dtsi} |   2 +-
  .../arm/boot/dts/stm32mp157a-msmp1evk-baa.dts |  22 +++
- .../boot/dts/stm32mp157a-msmp1evk-baa18.dts   |  22 +++
+ .../boot/dts/stm32mp157a-msmp1evk-baa18.dts   |  27 +++
  arch/arm/boot/dts/stm32mp157a-msmp1evk.dts    |  12 --
  ...tm32mp157a-msmp1testadap-baa-rgb-panel.dts |  23 +++
  .../stm32mp157c-msmp1evk-bbai-rgb-panel.dts   |  24 +++
@@ -50,7 +50,7 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  ...ts => stm32mp157x-msmp1evk-rgb-panel.dtsi} |   8 +-
  ...smp1evk.dtsi => stm32mp157x-msmp1evk.dtsi} |   8 +-
  ... stm32mp157x-msmp1testadap-rgb-panel.dtsi} |   7 +-
- 21 files changed, 543 insertions(+), 223 deletions(-)
+ 21 files changed, 548 insertions(+), 223 deletions(-)
  rename arch/arm/boot/dts/{stm32mp157a-msmp1.dtsi => stm32mp157a-msmp1-baa-v3.dtsi} (98%)
  create mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1evk-a0a.dts
  create mode 100644 arch/arm/boot/dts/stm32mp157a-msmp1evk-baa-rgb-panel.dts
@@ -266,10 +266,10 @@ index 0000000000000..eb4d65702f436
 +};
 diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts
 new file mode 100644
-index 0000000000000..2428a023308f0
+index 0000000000000..8bf81031d8fdd
 --- /dev/null
 +++ b/arch/arm/boot/dts/stm32mp157a-msmp1evk-baa18.dts
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,27 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 +/*
 + * Copyright (C) 2023-2025 Wolfgang Grandegger <wg@aries-embedded.de>
@@ -291,6 +291,11 @@ index 0000000000000..2428a023308f0
 +		device_type = "memory";
 +		reg = <0xC0000000 0x40000000>;
 +	};
++};
++
++&sdmmc2 {
++	mmc-ddr-1_8v;
++	max-frequency = <12500000>;
 +};
 diff --git a/arch/arm/boot/dts/stm32mp157a-msmp1evk.dts b/arch/arm/boot/dts/stm32mp157a-msmp1evk.dts
 deleted file mode 100644
