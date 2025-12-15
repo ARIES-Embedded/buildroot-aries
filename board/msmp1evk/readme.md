@@ -242,6 +242,40 @@ Boot from the SPI-NOR
    microSD card" starting at item 4.
 
 
+Boot from USB-OTG
+-----------------
+
+For board bring-up or debugging purposes it's also possible to load and
+start the bootloader via USB-OTG by using the STM32CubeProgrammer [4]
+on the host.
+For that purpose, you have to add `STM32MP_USB_PROGRAMMER=1`to the
+Buildroot config `BR2_TARGET_ARM_TRUSTED_FIRMWARE_ADDITIONAL_VARIABLES`
+manually. You can take the Bootloader images from the sub-directory `images`
+of the build directory.
+
+1. Power-down the board
+
+2. Select the boot mode `111` to boot from USB-OTG of the EVK board:
+
+       BOOT SW3: OFF
+       BOOT SW2: OFF
+       BOOT SW1: OFF
+
+3. Connect the Debug-Console and the USB-OTG to your host.
+
+3. Power-on the board and execute the following command on your host:
+
+       $ cat flash.tsv
+       #Opt    Id      Name    Type    IP      Offset  Binary
+       -       0x01    fsbl-boot       Binary  none    0x0     tf-a-stm32mp157a-msmp1evk-baa.stm32
+       -       0x03    fip-boot        FIP     none    0x0     fip.bin
+       $ <path>/STM32_Programmer_CLI -c port=USB1 -w flash.tsv
+
+   Please adjust the file names if necessary. Then you should see the
+   system booting on the Debug-Console.
+
+
 [1]: https://www.aries-embedded.com/system-on-module/cpu/stmp157-stmicro-cortexa7-msmp1-osm-ethernet-can
 [2]: https://www.aries-embedded.com/evaluation-kit/cpu/stmp157-stmicro-cortexa7-msmp1-osm-ethernet-can-msmp1evk
 [3]: ../../README.md
+[4]: https://www.st.com/en/development-tools/stm32cubeprog.html
