@@ -20,8 +20,14 @@ main()
 	local BOARD_PATH=${BR2_EXTERNAL_ARIES_PATH}/board/msmp1evk""
 
 	mkdir -p "$TARGET_DIR/boot/extlinux/"
+	conf_file="$TARGET_DIR/boot/extlinux/extlinux.conf"
 	sed -e "s/%BOARD_NAME%/${BOARD_NAME}/" \
-		${BOARD_PATH}/extlinux.conf.template > "$TARGET_DIR/boot/extlinux/extlinux.conf"
+		${BOARD_PATH}/extlinux.conf.template > "$conf_file"
+	case "$BOARD_NAME" in
+	    *baa18* ) sed -i -e "s+/dev/mmcblk0p4+/dev/mmcblk1p4+" "$conf_file"
+	    	    ;;
+	esac	
+
 
 	# Generate genimage configuration file to be used later by
 	# via confguration options:
