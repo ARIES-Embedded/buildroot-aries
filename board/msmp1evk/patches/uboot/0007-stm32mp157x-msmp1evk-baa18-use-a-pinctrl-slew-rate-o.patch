@@ -1,0 +1,33 @@
+From ce32d696c2050f6c20e87a8e5ca892cb2971a25f Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@aries-embedded.de>
+Date: Mon, 3 Aug 2026 13:27:16 +0200
+Subject: [PATCH 7/7] stm32mp157x-msmp1evk-baa18: use a pinctrl slew-rate of 1
+ for Fast Ethernet
+
+On the BAA18 modules Fast Ethernet works better with a slew-rate = <1>;
+for the pinctrl of the Ethernet lines. Otherwise a lot of packet losses
+do occur. GBit Ethernet is not yet working. Likely, special clock skew
+setting for the Phy are required.
+
+Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
+---
+ arch/arm/dts/stm32mp157a-msmp1evk-baa18.dts | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm/dts/stm32mp157a-msmp1evk-baa18.dts b/arch/arm/dts/stm32mp157a-msmp1evk-baa18.dts
+index 269617aa325..29fa5693c4e 100644
+--- a/arch/arm/dts/stm32mp157a-msmp1evk-baa18.dts
++++ b/arch/arm/dts/stm32mp157a-msmp1evk-baa18.dts
+@@ -24,3 +24,9 @@
+ &sdmmc2 {
+ 	mmc-ddr-1_8v;
+ };
++
++&ethernet0_rgmii_pins_b {
++       pins1 {
++               slew-rate = <1>;
++       };
++};
+-- 
+2.34.1
+

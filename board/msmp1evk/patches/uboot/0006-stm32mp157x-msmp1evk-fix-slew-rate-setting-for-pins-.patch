@@ -1,7 +1,7 @@
-From 4d4f67bfb0bbdc6dcaec444d0b276f15def6a0e5 Mon Sep 17 00:00:00 2001
+From 00c1ce31b6b55a148fc06436421a621d9ab3a899 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Mon, 15 Dec 2025 11:13:52 +0100
-Subject: [PATCH 6/6] stm32mp157x-msmp1evk: fix slew-rate setting for pins 4..7
+Subject: [PATCH 6/7] stm32mp157x-msmp1evk: fix slew-rate setting for pins 4..7
  for the eMMC
 
 The pinctrl setting for the pins 4..7 for the eMMC in the device-tree

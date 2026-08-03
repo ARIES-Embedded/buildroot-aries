@@ -1,7 +1,7 @@
-From 593e861944ae165fbbd8f46c89c298114b3590ae Mon Sep 17 00:00:00 2001
+From d1a226244ed313edfd386e793d96f5b66373c884 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Thu, 16 Oct 2025 18:50:51 +0200
-Subject: [PATCH 5/5] stm32mp157x-msmp1evk: define separate dts and config
+Subject: [PATCH 5/7] stm32mp157x-msmp1evk: define separate dts and config
  files for the various options
 
 Currently, there are the folloiwng hardware options, which require slightly
@@ -22,32 +22,33 @@ stm32mp157a-msmp1evk-baa18_defconfig:
 stm32mp157a-msmp1evk-baa-v3_defconfig:
     stm32mp157a-msmp1evk-baa-v3.dts, STM32MP157A, STPMIC1A, 1 GB LPDDR4
 
-We also need a different DDR3L configration file for 1GB.
+We also need a different DDR3L configration file for 1GB and special
+settings for the eMMC operating at 1.8V.
 
 Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
 ---
  arch/arm/dts/Makefile                         |   7 +-
  .../dts/stm32mp157a-msmp1evk-a0a-u-boot.dtsi  |   9 +
- arch/arm/dts/stm32mp157a-msmp1evk-a0a.dts     |  22 +++
+ arch/arm/dts/stm32mp157a-msmp1evk-a0a.dts     |  26 +++
  .../dts/stm32mp157a-msmp1evk-baa-u-boot.dtsi  |   9 +
  .../stm32mp157a-msmp1evk-baa-v3-u-boot.dtsi   |   9 +
  ...vk.dts => stm32mp157a-msmp1evk-baa-v3.dts} |   5 +-
  ....dtsi => stm32mp157a-msmp1evk-baa-v3.dtsi} |   0
- arch/arm/dts/stm32mp157a-msmp1evk-baa.dts     |  22 +++
+ arch/arm/dts/stm32mp157a-msmp1evk-baa.dts     |  26 +++
  .../stm32mp157a-msmp1evk-baa18-u-boot.dtsi    |   9 +
- arch/arm/dts/stm32mp157a-msmp1evk-baa18.dts   |  22 +++
+ arch/arm/dts/stm32mp157a-msmp1evk-baa18.dts   |  26 +++
  .../dts/stm32mp157c-msmp1evk-bbai-u-boot.dtsi |   9 +
- arch/arm/dts/stm32mp157c-msmp1evk-bbai.dts    |  23 +++
+ arch/arm/dts/stm32mp157c-msmp1evk-bbai.dts    |  27 +++
  arch/arm/dts/stm32mp157x-msmp1-stpmic1a.dtsi  | 149 +++++++++++++++
  arch/arm/dts/stm32mp157x-msmp1-stpmic1b.dtsi  | 149 +++++++++++++++
  ....dtsi => stm32mp157x-msmp1evk-u-boot.dtsi} |   8 +-
- ...msmp1evk.dts => stm32mp157x-msmp1evk.dtsi} |  15 --
+ ...msmp1evk.dts => stm32mp157x-msmp1evk.dtsi} |  18 --
  ...fig => stm32mp157a-msmp1evk-a0a_defconfig} |   2 +-
  configs/stm32mp157a-msmp1evk-baa-v3_defconfig | 176 ++++++++++++++++++
  configs/stm32mp157a-msmp1evk-baa18_defconfig  | 176 ++++++++++++++++++
  ...fig => stm32mp157a-msmp1evk-baa_defconfig} |   2 +-
  configs/stm32mp157c-msmp1evk-bbai_defconfig   | 176 ++++++++++++++++++
- 21 files changed, 971 insertions(+), 28 deletions(-)
+ 21 files changed, 987 insertions(+), 31 deletions(-)
  create mode 100644 arch/arm/dts/stm32mp157a-msmp1evk-a0a-u-boot.dtsi
  create mode 100644 arch/arm/dts/stm32mp157a-msmp1evk-a0a.dts
  create mode 100644 arch/arm/dts/stm32mp157a-msmp1evk-baa-u-boot.dtsi
@@ -62,7 +63,7 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  create mode 100644 arch/arm/dts/stm32mp157x-msmp1-stpmic1a.dtsi
  create mode 100644 arch/arm/dts/stm32mp157x-msmp1-stpmic1b.dtsi
  rename arch/arm/dts/{stm32mp157c-msmp1evk-u-boot.dtsi => stm32mp157x-msmp1evk-u-boot.dtsi} (95%)
- rename arch/arm/dts/{stm32mp157c-msmp1evk.dts => stm32mp157x-msmp1evk.dtsi} (96%)
+ rename arch/arm/dts/{stm32mp157c-msmp1evk.dts => stm32mp157x-msmp1evk.dtsi} (95%)
  rename configs/{stm32mp157c-msmp1evk_defconfig => stm32mp157a-msmp1evk-a0a_defconfig} (98%)
  create mode 100644 configs/stm32mp157a-msmp1evk-baa-v3_defconfig
  create mode 100644 configs/stm32mp157a-msmp1evk-baa18_defconfig
@@ -110,10 +111,10 @@ index 00000000000..49b9c4ab61f
 +#include "stm32mp157x-msmp1evk-u-boot.dtsi"
 diff --git a/arch/arm/dts/stm32mp157a-msmp1evk-a0a.dts b/arch/arm/dts/stm32mp157a-msmp1evk-a0a.dts
 new file mode 100644
-index 00000000000..b0b546ef7bf
+index 00000000000..43cb9123229
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157a-msmp1evk-a0a.dts
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,26 @@
 +// SPDX-License-Identifier: GPL-2.0+ OR BSD-3-Clause
 +/*
 + * Copyright (C) 2024-2025, Wolfgang Grandegger <wg@aries-embedded.de>
@@ -135,6 +136,10 @@ index 00000000000..b0b546ef7bf
 +		device_type = "memory";
 +		reg = <0xc0000000 0x20000000>;
 +	};
++};
++
++&sdmmc2 {
++	no-1-8-v;
 +};
 diff --git a/arch/arm/dts/stm32mp157a-msmp1evk-baa-u-boot.dtsi b/arch/arm/dts/stm32mp157a-msmp1evk-baa-u-boot.dtsi
 new file mode 100644
@@ -197,10 +202,10 @@ rename from arch/arm/dts/stm32mp157a-msmp1evk-u-boot.dtsi
 rename to arch/arm/dts/stm32mp157a-msmp1evk-baa-v3.dtsi
 diff --git a/arch/arm/dts/stm32mp157a-msmp1evk-baa.dts b/arch/arm/dts/stm32mp157a-msmp1evk-baa.dts
 new file mode 100644
-index 00000000000..40eccba24da
+index 00000000000..3dee93f42f4
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157a-msmp1evk-baa.dts
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,26 @@
 +// SPDX-License-Identifier: GPL-2.0+ OR BSD-3-Clause
 +/*
 + * Copyright (C) 2024-2025, Wolfgang Grandegger <wg@aries-embedded.de>
@@ -223,6 +228,10 @@ index 00000000000..40eccba24da
 +		reg = <0xc0000000 0x40000000>;
 +	};
 +};
++
++&sdmmc2 {
++	no-1-8-v;
++};
 diff --git a/arch/arm/dts/stm32mp157a-msmp1evk-baa18-u-boot.dtsi b/arch/arm/dts/stm32mp157a-msmp1evk-baa18-u-boot.dtsi
 new file mode 100644
 index 00000000000..b5752f780c6
@@ -240,10 +249,10 @@ index 00000000000..b5752f780c6
 +#include "stm32mp157x-msmp1evk-u-boot.dtsi"
 diff --git a/arch/arm/dts/stm32mp157a-msmp1evk-baa18.dts b/arch/arm/dts/stm32mp157a-msmp1evk-baa18.dts
 new file mode 100644
-index 00000000000..1d1dce812d5
+index 00000000000..269617aa325
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157a-msmp1evk-baa18.dts
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,26 @@
 +// SPDX-License-Identifier: GPL-2.0+ OR BSD-3-Clause
 +/*
 + * Copyright (C) 2024-2025, Wolfgang Grandegger <wg@aries-embedded.de>
@@ -266,6 +275,10 @@ index 00000000000..1d1dce812d5
 +		reg = <0xc0000000 0x40000000>;
 +	};
 +};
++
++&sdmmc2 {
++	mmc-ddr-1_8v;
++};
 diff --git a/arch/arm/dts/stm32mp157c-msmp1evk-bbai-u-boot.dtsi b/arch/arm/dts/stm32mp157c-msmp1evk-bbai-u-boot.dtsi
 new file mode 100644
 index 00000000000..b5752f780c6
@@ -283,10 +296,10 @@ index 00000000000..b5752f780c6
 +#include "stm32mp157x-msmp1evk-u-boot.dtsi"
 diff --git a/arch/arm/dts/stm32mp157c-msmp1evk-bbai.dts b/arch/arm/dts/stm32mp157c-msmp1evk-bbai.dts
 new file mode 100644
-index 00000000000..0b8ee408b14
+index 00000000000..31017445f14
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp157c-msmp1evk-bbai.dts
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,27 @@
 +// SPDX-License-Identifier: GPL-2.0+ OR BSD-3-Clause
 +/*
 + * Copyright (C) 2024-2025, Wolfgang Grandegger <wg@aries-embedded.de>
@@ -309,6 +322,10 @@ index 00000000000..0b8ee408b14
 +		device_type = "memory";
 +		reg = <0xc0000000 0x40000000>;
 +	};
++};
++
++&sdmmc2 {
++	no-1-8-v;
 +};
 diff --git a/arch/arm/dts/stm32mp157x-msmp1-stpmic1a.dtsi b/arch/arm/dts/stm32mp157x-msmp1-stpmic1a.dtsi
 new file mode 100644
@@ -650,10 +667,10 @@ index cc9732bb94a..bbedafdb676 100644
  		led-red {
  			label = "error";
 diff --git a/arch/arm/dts/stm32mp157c-msmp1evk.dts b/arch/arm/dts/stm32mp157x-msmp1evk.dtsi
-similarity index 96%
+similarity index 95%
 rename from arch/arm/dts/stm32mp157c-msmp1evk.dts
 rename to arch/arm/dts/stm32mp157x-msmp1evk.dtsi
-index 0932625320b..dca724da090 100644
+index 0932625320b..6437f0d2680 100644
 --- a/arch/arm/dts/stm32mp157c-msmp1evk.dts
 +++ b/arch/arm/dts/stm32mp157x-msmp1evk.dtsi
 @@ -3,19 +3,9 @@
@@ -688,6 +705,16 @@ index 0932625320b..dca724da090 100644
  	reserved-memory {
  		#address-cells = <1>;
  		#size-cells = <1>;
+@@ -363,9 +348,6 @@
+ 	st,neg-edge;
+ 	bus-width = <8>;
+ 	vmmc-supply = <&v3v3>;
+-	//vqmmc-supply = <&vdd>;
+-	//mmc-ddr-3_3v;
+-	no-1-8-v;
+ 	status = "okay";
+ };
+ 
 diff --git a/configs/stm32mp157c-msmp1evk_defconfig b/configs/stm32mp157a-msmp1evk-a0a_defconfig
 similarity index 98%
 rename from configs/stm32mp157c-msmp1evk_defconfig

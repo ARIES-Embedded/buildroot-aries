@@ -1,7 +1,7 @@
 From f687e011bab93b87143ad893384df920c2bf994c Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Thu, 16 Oct 2025 20:14:13 +0200
-Subject: [PATCH 6/7] ARM: dts: stm32mp157x-msmp1evk: define separate dts files
+Subject: [PATCH 6/8] ARM: dts: stm32mp157x-msmp1evk: define separate dts files
  for the various options
 
 Currently, there are the folloiwng hardware options, which require slightly
