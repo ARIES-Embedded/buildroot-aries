@@ -1,0 +1,42 @@
+From b1d1110a1f627ed6d23245dcf624f31805ba9de3 Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@aries-embedded.de>
+Date: Tue, 15 Sep 2026 16:26:12 +0200
+Subject: [PATCH 1/2] drm/stm: ltdc: fix line interrupt position
+
+If the value written to the line interrupt position register is
+greater than the calculated value, no line interrupt is triggered
+and a timeout is reported:
+
+  # modetest -M stm -s 32@39:800x480
+  opened device STMicroelectronics SoC DRM on driver stm (version 1.0.0 at 20170330)
+  setting mode 800x480-60.00Hz on connectors 32, crtc 39
+  [  247.773048] stm32-display 48010000.display-controller: [drm] *ERROR* flip_done timed out
+  [  247.775610] stm32-display 48010000.display-controller: [drm] *ERROR* [CRTC:39:crtc-0] commit wait timed out
+
+The driver actually adds one to the real value, which triggers
+the issue:
+
+  accum_act_h = accum_vbp + mode->vdisplay;
+  regmap_write(ldev->regmap, LTDC_LIPCR, accum_act_h + 1);
+
+Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
+---
+ drivers/gpu/drm/stm/ltdc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/stm/ltdc.c b/drivers/gpu/drm/stm/ltdc.c
+index 3845c19461b5..bb3d7e1dcfd0 100644
+--- a/drivers/gpu/drm/stm/ltdc.c
++++ b/drivers/gpu/drm/stm/ltdc.c
+@@ -1206,7 +1206,7 @@ static void ltdc_crtc_atomic_enable(struct drm_crtc *crtc,
+ 	val = (total_width << 16) | total_height;
+ 	regmap_update_bits(ldev->regmap, LTDC_TWCR, TWCR_TOTALH | TWCR_TOTALW, val);
+ 
+-	regmap_write(ldev->regmap, LTDC_LIPCR, (accum_act_h + 1));
++	regmap_write(ldev->regmap, LTDC_LIPCR, accum_act_h );
+ 
+ 	/* Configures the HS, VS, DE and PC polarities. Default Active Low */
+ 	val = 0;
+-- 
+2.34.1
+

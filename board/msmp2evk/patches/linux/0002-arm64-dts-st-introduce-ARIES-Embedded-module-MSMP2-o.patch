@@ -1,0 +1,1238 @@
+From 77f9769e47904c4d002d0c04ad1e0fd0496386e5 Mon Sep 17 00:00:00 2001
+From: Wolfgang Grandegger <wg@aries-embedded.de>
+Date: Mon, 24 Aug 2026 10:10:30 +0200
+Subject: [PATCH 2/2] arm64: dts: st: introduce ARIES Embedded module MSMP2 on
+ EVK
+
+Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
+---
+ arch/arm64/boot/dts/st/Makefile               |   1 +
+ arch/arm64/boot/dts/st/stm32mp25-pinctrl.dtsi | 113 ++-
+ .../dts/st/stm32mp255d-msmp2evk-resmem.dtsi   | 195 +++++
+ .../boot/dts/st/stm32mp255d-msmp2evk.dts      | 778 ++++++++++++++++++
+ drivers/gpu/drm/panel/panel-simple.c          |  65 ++
+ 5 files changed, 1150 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/st/stm32mp255d-msmp2evk-resmem.dtsi
+ create mode 100644 arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts
+
+diff --git a/arch/arm64/boot/dts/st/Makefile b/arch/arm64/boot/dts/st/Makefile
+index 63908113ae36..eb7a7834ac9b 100644
+--- a/arch/arm64/boot/dts/st/Makefile
++++ b/arch/arm64/boot/dts/st/Makefile
+@@ -3,4 +3,5 @@ dtb-$(CONFIG_ARCH_STM32) += \
+ 	stm32mp215f-dk.dtb \
+ 	stm32mp235f-dk.dtb \
+ 	stm32mp257f-dk.dtb \
++	stm32mp255d-msmp2evk.dtb \
+ 	stm32mp257f-ev1.dtb
+diff --git a/arch/arm64/boot/dts/st/stm32mp25-pinctrl.dtsi b/arch/arm64/boot/dts/st/stm32mp25-pinctrl.dtsi
+index 33f1ce973421..3899e4271771 100644
+--- a/arch/arm64/boot/dts/st/stm32mp25-pinctrl.dtsi
++++ b/arch/arm64/boot/dts/st/stm32mp25-pinctrl.dtsi
+@@ -256,10 +256,27 @@ pins1 {
+ 		};
+ 	};
+ 
++	i2c1_pins_a: i2c1-0 {
++		pins {
++			pinmux = <STM32_PINMUX('A', 3, AF10)>, /* I2C2_SCL */
++				 <STM32_PINMUX('A', 2, AF10)>; /* I2C2_SDA */
++			bias-disable;
++			drive-open-drain;
++			slew-rate = <0>;
++		};
++	};
++
++	i2c1_sleep_pins_a: i2c1-sleep-0 {
++		pins {
++			pinmux = <STM32_PINMUX('A', 3, ANALOG)>, /* I2C2_SCL */
++				 <STM32_PINMUX('A', 2, ANALOG)>; /* I2C2_SDA */
++		};
++	};
++
+ 	i2c2_pins_a: i2c2-0 {
+ 		pins {
+-			pinmux = <STM32_PINMUX('B', 5, AF9)>, /* I2C2_SCL */
+-				 <STM32_PINMUX('B', 4, AF9)>; /* I2C2_SDA */
++			pinmux = <STM32_PINMUX('B', 5, AF10)>, /* I2C2_SCL */
++				 <STM32_PINMUX('B', 4, AF10)>; /* I2C2_SDA */
+ 			bias-disable;
+ 			drive-open-drain;
+ 			slew-rate = <0>;
+@@ -484,6 +501,21 @@ pins {
+ 		};
+ 	};
+ 
++	pwm5_ch2_pins_a: pwm5-ch2-0 {
++		pins {
++			pinmux = <STM32_PINMUX('I', 5, AF8)>; /* TIM5_CH2 */
++			bias-pull-down;
++			drive-push-pull;
++			slew-rate = <0>;
++		};
++	};
++
++	pwm5_ch2_sleep_pins_a: pwm5-ch2-sleep-0 {
++		pins {
++			pinmux = <STM32_PINMUX('I', 5, ANALOG)>; /* TIM5_CH2 */
++		};
++	};
++
+ 	rtc_out2_rmp_pins_a: rtc-out2-rmp-pins-0 {
+ 		pins {
+ 			pinmux = <STM32_PINMUX('I', 8, ANALOG)>; /* RTC_OUT2_RMP */
+@@ -801,6 +833,66 @@ pins1 {
+ 		};
+ 	};
+ 
++	uart5_pins_a: uart5-0 {
++		pins1 {
++			pinmux = <STM32_PINMUX('G', 9, AF5)>; /* UART5_TX */
++			bias-disable;
++			drive-push-pull;
++			slew-rate = <0>;
++		};
++		pins2 {
++			pinmux = <STM32_PINMUX('G', 10, AF5)>; /* UART5_RX */
++			bias-disable;
++		};
++	};
++
++	uart5_idle_pins_a: uart5-idle-0 {
++		pins1 {
++			pinmux = <STM32_PINMUX('G', 9, ANALOG)>; /* UART5_TX */
++		};
++		pins2 {
++			pinmux = <STM32_PINMUX('G', 10, AF5)>; /* UART5_RX */
++			bias-disable;
++		};
++	};
++
++	uart5_sleep_pins_a: uart5-sleep-0 {
++		pins {
++			pinmux = <STM32_PINMUX('A', 9, ANALOG)>, /* UART5_TX */
++				 <STM32_PINMUX('A', 10, ANALOG)>; /* UART5_RX */
++		};
++	};
++
++	uart9_pins_a: uart9-0 {
++		pins1 {
++			pinmux = <STM32_PINMUX('D', 13, AF6)>; /* UART9_TX */
++			bias-disable;
++			drive-push-pull;
++			slew-rate = <0>;
++		};
++		pins2 {
++			pinmux = <STM32_PINMUX('B', 14, AF6)>; /* UART9_RX */
++			bias-disable;
++		};
++	};
++
++	uart9_idle_pins_a: uart9-idle-0 {
++		pins1 {
++			pinmux = <STM32_PINMUX('D', 13, ANALOG)>; /* UART9_TX */
++		};
++		pins2 {
++			pinmux = <STM32_PINMUX('B', 14, AF6)>; /* UART9_RX */
++			bias-disable;
++		};
++	};
++
++	uart9_sleep_pins_a: uart9-sleep-0 {
++		pins {
++			pinmux = <STM32_PINMUX('D', 13, ANALOG)>, /* UART9_TX */
++				 <STM32_PINMUX('B', 14, ANALOG)>; /* UART9_RX */
++		};
++	};
++
+ 	usart1_pins_a: usart1-0 {
+ 		pins1 {
+ 			pinmux = <STM32_PINMUX('G', 14, AF6)>, /* USART1_TX */
+@@ -932,6 +1024,23 @@ pins {
+ 		};
+ 	};
+ 
++	i2c8_pins_b: i2c8-1 {
++		pins {
++			pinmux = <STM32_PINMUX('Z', 4, AF8)>, /* I2C8_SCL */
++				 <STM32_PINMUX('Z', 9, AF8)>; /* I2C8_SDA */
++			bias-disable;
++			drive-open-drain;
++			slew-rate = <0>;
++		};
++	};
++
++	i2c8_sleep_pins_b: i2c8-sleep-1 {
++		pins {
++			pinmux = <STM32_PINMUX('Z', 4, ANALOG)>, /* I2C8_SCL */
++				 <STM32_PINMUX('Z', 9, ANALOG)>; /* I2C8_SDA */
++		};
++	};
++
+ 	i3c4_pins_a: i3c4-0 {
+ 		pins {
+ 			pinmux = <STM32_PINMUX('Z', 4, AF11)>, /* I3C4_SCL */
+diff --git a/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk-resmem.dtsi b/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk-resmem.dtsi
+new file mode 100644
+index 000000000000..2a93d5ed87cd
+--- /dev/null
++++ b/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk-resmem.dtsi
+@@ -0,0 +1,195 @@
++// SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
++/*
++ * Copyright (C) STMicroelectronics 2022 - All Rights Reserved
++ * Author: Loic Pallardy loic.pallardy@foss.st.com for STMicroelectronics.
++ */
++
++/*
++ * STM32MP25 reserved memory device tree configuration
++ * Project : open
++ * Generated by XLmx tool version 2.2 - 3/6/2024 11:20:05 AM
++ */
++
++/ {
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		/* Internal RAM reserved memory declaration */
++		tfa_bl31: tfa-bl31@a000000 {
++			reg = <0x0 0xa000000 0x0 0x20000>;
++			no-map;
++		};
++
++		hpdma1_lli: hpdma1-lli@a020000 {
++			reg = <0x0 0xa020000 0x0 0x10000>;
++			no-map;
++		};
++
++		hpdma2_lli: hpdma2-lli@a030000 {
++			reg = <0x0 0xa030000 0x0 0xe000>;
++			no-map;
++		};
++
++		hpdma3_lli: hpdma3-lli@a03e000 {
++			reg = <0x0 0xa03e000 0x0 0x2000>;
++			no-map;
++		};
++
++		bsec_mirror: bsec-mirror@a040000 {
++			reg = <0x0 0xa040000 0x0 0x1000>;
++			no-map;
++		};
++
++		scmi_cid2_s: scmi-cid2-s@a041000 {
++			reg = <0x0 0xa041000 0x0 0x1000>;
++			no-map;
++		};
++
++		scmi_cid2_ns: scmi-cid2-ns@a042000 {
++			reg = <0x0 0xa042000 0x0 0x1000>;
++			no-map;
++		};
++
++		cm33_sram1: cm33-sram1@a043000 {
++			reg = <0x0 0xa043000 0x0 0x1d000>;
++			no-map;
++		};
++
++		cm33_sram2: cm33-sram2@a060000 {
++			reg = <0x0 0xa060000 0x0 0x20000>;
++			no-map;
++		};
++
++		cm33_retram: cm33-retram@a080000 {
++			reg = <0x0 0xa080000 0x0 0x1f000>;
++			no-map;
++		};
++
++		ddr_param: ddr-param@a09f000 {
++			reg = <0x0 0xa09f000 0x0 0x1000>;
++			no-map;
++		};
++
++		cm0_cube_fw: cm0-cube-fw@200C0000 {
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x200C0000 0x0 0x4000>;
++			no-map;
++		};
++
++		cm0_cube_data: cm0-cube-data@200C4000 {
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x200C4000 0x0 0x2000>;
++			no-map;
++		};
++
++		ipc_shmem_2: ipc-shmem-2@200C6000{
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x200C6000 0x0 0x2000>;
++			no-map;
++		};
++
++		/* Backup RAM reserved memory declaration */
++		bl31_lowpower: bl31-lowpower@42000000 {
++			reg = <0x0 0x42000000 0x0 0x1000>;
++			no-map;
++		};
++
++		tfm_its: tfm-its@42001000 {
++			reg = <0x0 0x42001000 0x0 0x1000>;
++			no-map;
++		};
++
++		/* Octo Memory Manager reserved memory declaration */
++		mm_ospi1: mm-ospi@60000000 {
++			reg = <0x0 0x60000000 0x0 0x10000000>;
++			no-map;
++		};
++
++		/* DDR reserved memory declaration */
++		tfm_code: tfm-code@80000000 {
++			reg = <0x0 0x80000000 0x0 0x100000>;
++			no-map;
++		};
++
++		cm33_cube_fw: cm33-cube-fw@80100000 {
++			reg = <0x0 0x80100000 0x0 0x800000>;
++			no-map;
++		};
++
++		tfm_data: tfm-data@80900000 {
++			reg = <0x0 0x80900000 0x0 0x100000>;
++			no-map;
++		};
++
++		cm33_cube_data: cm33-cube-data@80a00000 {
++			reg = <0x0 0x80a00000 0x0 0x800000>;
++			no-map;
++		};
++
++		ipc_shmem_1: ipc-shmem-1@81200000 {
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x81200000 0x0 0xf8000>;
++			no-map;
++		};
++
++		vdev0vring0: vdev0vring0@812f8000 {
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x812f8000 0x0 0x1000>;
++			no-map;
++		};
++
++		vdev0vring1: vdev0vring1@812f9000 {
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x812f9000 0x0 0x1000>;
++			no-map;
++		};
++
++		vdev0buffer: vdev0buffer@812fa000 {
++			compatible = "shared-dma-pool";
++			reg = <0x0 0x812fa000 0x0 0x6000>;
++			no-map;
++		};
++
++		spare1: spare1@81300000 {
++			reg = <0x0 0x81300000 0x0 0xcc0000>;
++			no-map;
++		};
++
++		bl31_context: bl31-context@81fc0000 {
++			reg = <0x0 0x81fc0000 0x0 0x40000>;
++			no-map;
++		};
++
++		op_tee: op-tee@82000000 {
++			reg = <0x0 0x82000000 0x0 0x2000000>;
++			no-map;
++		};
++
++		gpu_reserved: gpu-reserved@fa800000 {
++			reg = <0x0 0xfa800000 0x0 0x4000000>;
++			no-map;
++		};
++
++		ltdc_sec_layer: ltdc-sec-layer@fe800000 {
++			reg = <0x0 0xfe800000 0x0 0x800000>;
++			no-map;
++		};
++
++		ltdc_sec_rotation: ltdc-sec-rotation@ff000000 {
++			reg = <0x0 0xff000000 0x0 0x1000000>;
++			no-map;
++		};
++
++		/* global autoconfigured region for contiguous allocations */
++		linux,cma {
++			compatible = "shared-dma-pool";
++			reusable;
++			alloc-ranges = <0 0x80000000 0 0x80000000>;
++			size = <0x0 0x8000000>;
++			alignment = <0x0 0x2000>;
++			linux,cma-default;
++		};
++	};
++};
+diff --git a/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts b/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts
+new file mode 100644
+index 000000000000..9ceca9f9fce1
+--- /dev/null
++++ b/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts
+@@ -0,0 +1,778 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
++/*
++ * Copyright (C) STMicroelectronics 2023 - All Rights Reserved
++ * Author: Alexandre Torgue <alexandre.torgue@foss.st.com> for STMicroelectronics.
++ */
++
++/dts-v1/;
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++#include <dt-bindings/leds/common.h>
++#include <dt-bindings/pwm/pwm.h>
++#include <dt-bindings/rtc/rtc-stm32.h>
++#include "stm32mp255.dtsi"
++#include "stm32mp25-pinctrl.dtsi"
++#include "stm32mp25xxak-pinctrl.dtsi"
++#include "stm32mp255d-msmp2evk-resmem.dtsi"
++
++#define USE_PANEL
++//#define USE_PANEL_BACKLIGHT
++#define USE_CAMERA
++#define USE_UART_A
++//#define USE_UART_B
++
++/ {
++	model = "ARIES Embedded MSMP2 module with STM32MP255D on EVK";
++	compatible = "aries,stm32mp255d-msmp2evk", "st,stm32mp257f-dk", "st,stm32mp257";
++
++	aliases {
++		serial0 = &uart5;
++#ifdef USE_UART_A
++		serial1 = &uart9;
++#ifdef USE_UART_B
++		serial2 = &usart1;
++#endif
++#else
++#ifdef USE_UART_B
++		serial1 = &usart1;
++#endif
++#endif
++		ethernet0 = &eth1;
++	};
++
++	chosen {
++		stdout-path = "serial0:115200n8";
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		framebuffer {
++			compatible = "simple-framebuffer";
++			clocks = <&rcc CK_BUS_LTDC>, <&rcc CK_KER_LTDC>,
++				 <&rcc CK_BUS_LVDS>, <&rcc CK_KER_LVDSPHY>;
++			status = "disabled";
++		};
++	};
++
++#ifdef USE_CAMERA
++	imx219_vana_2v8: 2p8v {
++		compatible = "regulator-fixed";
++		regulator-name = "camera_vana";
++		regulator-min-microvolt = <2800000>;
++		regulator-max-microvolt = <2800000>;
++		regulator-always-on;
++	};
++
++	imx219_vdig_1v8: 1p8v {
++		compatible = "regulator-fixed";
++		regulator-name = "camera_vdig";
++		regulator-min-microvolt = <1500000>;
++		regulator-max-microvolt = <1500000>;
++		regulator-always-on;
++	};
++
++	imx219_vddl_1v2: 1p2v {
++		compatible = "regulator-fixed";
++		regulator-name = "camera_vddl";
++		regulator-min-microvolt = <1200000>;
++		regulator-max-microvolt = <1200000>;
++		regulator-always-on;
++	};
++
++	clocks {
++		clk_ext_camera: clk-ext-camera {
++			#clock-cells = <0>;
++			compatible = "fixed-clock";
++			clock-frequency = <24000000>;
++		};
++	};
++#endif
++
++	clock_critical: clock_critical {
++		compatible = "st,stm32-hog";
++		clocks = <&rcc CK_LPTIM4_AM>;
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		reg = <0x0 0x80000000 0x0 0x40000000>;
++	};
++
++#ifdef USE_PANEL
++	panel_lvds: panel-lvds {
++		/* This setting works fine for the Ampire AM800480R2
++		 * display connected to the DS90CF386 LVDS Receiver
++		 */
++		compatible = "ampire,am800480r2-ds90cf386", "panel-lvds";
++#ifdef USE_PANEL_BACKLIGHT
++		backlight = <&panel_lvds_backlight>;
++#endif
++		power-supply = <&scmi_v3v3>;
++		status = "okay";
++	
++		width-mm = <155>;
++		height-mm = <93>;
++		data-mapping = "jeida-24";
++
++		panel-timing {
++			/* Should match the clock rate defined in &lcdif */
++			//clock-frequency = <71142857>;
++			clock-frequency = <30502140>;
++			hactive = <800>;
++			hfront-porch = <0>;
++			hsync-len = <1>;
++			hback-porch = <160>;
++			vactive = <480>;
++			vfront-porch = <0>;
++			vsync-len = <49>;
++			vback-porch = <0>;
++		};
++
++		port {
++			lvds_panel_in: endpoint {
++				remote-endpoint = <&lvds_out0>;
++			};
++		};
++	};
++
++#ifdef USE_PANEL_BACKLIGHT
++	panel_lvds_backlight: panel-lvds-backlight {
++		compatible = "pwm-backlight";
++		//pwms = <&pwm5 1 1000000 0>;
++		pwms = <&pwm5 1 40000 PWM_POLARITY_INVERTED>;
++		brightness-levels = <0 16 22 30 40 55 75 102 138 188 255>;
++		default-brightness-level = <10>;
++		status = "okay";
++	};
++#endif
++#endif
++
++};
++
++&a35ss_syscfg {
++	status = "okay";
++};
++
++&ahbsr {
++	mbox_client: mailbox-client@1 {
++		compatible = "mbox-cdev";
++		reg = <1 0>;
++		memory-region =  <&ipc_shmem_2>;
++		mboxes = <&ipcc2 0>;
++		mbox-names = "rx-tx";
++		status = "okay";
++	};
++};
++
++&arm_wdt {
++	timeout-sec = <32>;
++	status = "okay";
++};
++
++&combophy {
++	st,ssc-on;
++	status = "okay";
++};
++
++&crc {
++	status = "okay";
++};
++
++&cs_cpu_debug0 {
++	status = "okay";
++};
++
++&cs_cpu_debug1 {
++	status = "okay";
++};
++
++&cs_cti0 {
++	status = "okay";
++};
++
++&cs_cti1 {
++	status = "okay";
++};
++
++&cs_cti_cpu0 {
++	status = "okay";
++};
++
++&cs_cti_cpu1 {
++	status = "okay";
++};
++
++&cs_etf {
++	status = "okay";
++};
++
++&cs_etm0 {
++	status = "okay";
++};
++
++&cs_etm1 {
++	status = "okay";
++};
++
++&cs_etr {
++	status = "okay";
++};
++
++&cs_funnel {
++	status = "okay";
++};
++
++&cs_replicator {
++	status = "okay";
++};
++
++&cs_stm {
++	status = "okay";
++};
++
++&cs_tpiu {
++	status = "okay";
++};
++
++#ifdef USE_CAMERA
++&csi {
++	vdd-supply =  <&scmi_vddcore>;
++	vdda18-supply = <&scmi_v1v8>;
++	status = "okay";
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		port@0 {
++			reg = <0>;
++			csi_sink: endpoint {
++				remote-endpoint = <&imx219_ep>;
++				data-lanes = <1 2>;
++				bus-type = <4>;
++			};
++		};
++		port@1 {
++			reg = <1>;
++			csi_source: endpoint {
++				remote-endpoint = <&dcmipp_0>;
++			};
++		};
++	};
++};
++#endif
++
++&dbg_bus {
++	status = "okay";
++};
++
++#ifdef USE_CAMERA
++&dcmipp {
++	status = "okay";
++	port {
++		dcmipp_0: endpoint {
++			remote-endpoint = <&csi_source>;
++			bus-type = <4>;
++		};
++	};
++};
++#endif
++
++#ifdef USE_PANELx
++&dsi {
++	vdd-supply =  <&scmi_vddcore>;
++	vdda18-supply = <&scmi_v1v8>;
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++			dsi_in: endpoint {
++				remote-endpoint = <&ltdc_ep0_out>;
++			};
++		};
++
++		//port@1 {
++		//	reg = <1>;
++		//	dsi_out1: endpoint {
++		//		remote-endpoint = <&adv7535_in>;
++		//	};
++		//};
++	};
++};
++#endif
++
++&eth1 {
++	status = "okay";
++	pinctrl-0 = <&eth1_rgmii_pins_b>;
++	pinctrl-1 = <&eth1_rgmii_sleep_pins_b>;
++	pinctrl-names = "default", "sleep";
++	phy-mode = "rgmii-id";
++	max-speed = <1000>;
++	phy-handle = <&phy1_eth1>;
++	phy-supply = <&scmi_vdd_io>;
++	st,eth-ptp-from-rcc;
++
++	mdio1 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		compatible = "snps,dwmac-mdio";
++		phy1_eth1: ethernet-phy@7 {
++			compatible = "ethernet-phy-id001c.c916";
++			//reset-gpios =  <&gpioa 2 GPIO_ACTIVE_LOW>;
++			reset-assert-us = <10000>;
++			reset-deassert-us = <80000>;
++			realtek,eee-disable;
++			reg = <7>;
++		};
++	};
++};
++
++&gpioi {
++	status = "okay";
++};
++
++#ifdef USE_PANEL
++&gpu {
++	contiguous-area = <&gpu_reserved>;
++	status = "okay";
++};
++#endif
++
++&hpdma {
++	memory-region = <&hpdma1_lli>;
++};
++
++&hpdma2 {
++	memory-region = <&hpdma2_lli>;
++};
++
++&hpdma3 {
++	memory-region = <&hpdma3_lli>;
++};
++
++&i2c1 {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&i2c1_pins_a>;
++	pinctrl-1 = <&i2c1_sleep_pins_a>;
++	i2c-scl-rising-time-ns = <108>;
++	i2c-scl-falling-time-ns = <12>;
++	clock-frequency = <100000>;
++	status = "okay";
++	/* spare dmas for other usage */
++	/delete-property/dmas;
++	/delete-property/dma-names;
++
++#ifdef USE_PANEL
++	touch: ft5426@38 {
++		compatible = "edt,edt-ft5506";
++		reg = <0x38>;
++		/* Use Pin 20 on J5 (GPIO_A2) to IRQ2-10, requires patch wire */
++		interrupt-parent = <&gpioi>;
++		interrupts = <10 IRQ_TYPE_EDGE_FALLING>;
++		touchscreen-size-x = <800>;
++		touchscreen-size-y = <480>;
++		status = "okay";
++	};
++#endif
++
++#ifdef USE_CAMERA
++	imx219: camera@10 {
++		compatible = "sony,imx219";
++		reg = <0x10>;
++		clock-names = "xclk";
++		clocks = <&clk_ext_camera>;
++		clock-frequency = <24000000>;
++		VANA-supply = <&imx219_vana_2v8>;
++		VDIG-supply = <&imx219_vdig_1v8>;
++		VDDL-supply = <&imx219_vddl_1v2>;
++
++		port {
++			imx219_ep: endpoint {
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++				link-frequencies = /bits/ 64 <456000000>;
++				remote-endpoint = <&csi_sink>;
++			};
++		};
++	};
++#endif		
++};
++
++&i2c2 {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&i2c2_pins_a>;
++	pinctrl-1 = <&i2c2_sleep_pins_a>;
++	i2c-scl-rising-time-ns = <108>;
++	i2c-scl-falling-time-ns = <12>;
++	clock-frequency = <100000>;
++	status = "okay";
++	/* spare dmas for other usage */
++	/delete-property/dmas;
++	/delete-property/dma-names;
++
++};
++
++&i2c8 {
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&i2c8_pins_b>;
++	pinctrl-1 = <&i2c8_sleep_pins_b>;
++	i2c-scl-rising-time-ns = <185>;
++	i2c-scl-falling-time-ns = <20>;
++	clock-frequency = <100000>;
++	status = "okay";
++	/* spare dmas for other usage */
++	/delete-property/dmas;
++	/delete-property/dma-names;
++};
++
++&ipcc1 {
++	status = "okay";
++};
++
++&ipcc2 {
++	status = "okay";
++};
++
++/* use LPTIMER with tick broadcast for suspend mode */
++&lptimer3 {
++	clocks = <&rcc CK_LPTIM3_AM>;
++	status = "okay";
++	timer {
++		status = "okay";
++	};
++};
++
++#ifdef USE_PANEL
++&ltdc {
++	status = "okay";
++
++	port {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++#if 0
++		ltdc_ep0_out: endpoint@0 {
++			reg = <0>;
++			remote-endpoint = <&dsi_in>;
++		};
++
++		ltdc_ep1_out: endpoint@1 {
++			reg = <1>;
++			remote-endpoint = <&lvds_in>;
++		};
++#else
++		ltdc_ep0_out: endpoint@0 {
++			reg = <0>;
++			remote-endpoint = <&lvds_in>;
++		};
++#endif
++	};
++};
++
++&lvds {
++	vdd-supply =  <&scmi_vddcore>;
++	vdda18-supply = <&scmi_v1v8>;
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++			lvds_in: endpoint {
++				remote-endpoint = <&ltdc_ep0_out>;
++			};
++		};
++
++		port@1 {
++			reg = <1>;
++			lvds_out0: endpoint {
++				remote-endpoint = <&lvds_panel_in>;
++			};
++		};
++	};
++};
++#endif
++
++&m0_rproc {
++	memory-region = <&cm0_cube_fw>, <&cm0_cube_data>;
++	clocks = <&rcc CK_CPU3>,
++		 <&rcc CK_CPU3_AM>,
++		 <&rcc CK_LPUART1_C3>,
++		 <&rcc CK_KER_LPUART1>,
++		 <&rcc CK_LPUART1_AM>,
++		 <&rcc CK_GPIOZ_C3>,
++		 <&scmi_clk CK_SCMI_GPIOZ>,
++		 <&scmi_clk CK_SCMI_GPIOZ_AM>,
++		 <&rcc CK_LPTIM4_C3>,
++		 <&rcc CK_KER_LPTIM4>,
++		 <&rcc CK_LPTIM4_AM>,
++		 <&scmi_clk CK_SCMI_IPCC2>,
++		 <&scmi_clk CK_SCMI_IPCC2_AM>;
++	status = "okay";
++};
++
++&m33_rproc {
++	mboxes = <&ipcc1 0x100>, <&ipcc1 0x101>, <&ipcc1 2>;
++	mbox-names = "vq0", "vq1", "shutdown";
++	memory-region = <&cm33_cube_fw>, <&cm33_cube_data>,
++			<&ipc_shmem_1>, <&vdev0vring0>,
++			<&vdev0vring1>, <&vdev0buffer>,
++			<&cm33_sram2>;
++	st,syscfg-nsvtor = <&a35ss_syscfg 0x20a8 0xffffff80>;
++	status = "okay";
++};
++
++&mlahb {
++	intc_rpmsg: interrupt-controller@1 {
++		compatible = "rpmsg,intc";
++		reg = <1 0>;
++		#interrupt-cells = <1>;
++		interrupt-controller;
++	};
++
++	i2c_rpmsg: i2c@2 {
++		compatible = "rpmsg,i2c-controller";
++		reg = <2 0>;
++		rpmsg,dev-id = "rpmsg_i2c";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		status = "okay";
++
++		typec@35 {
++			compatible = "st,stm32mp25-typec";
++			reg = <0x35>;
++			interrupts-extended = <&intc_rpmsg 0>;
++			status = "okay";
++			connector {
++				compatible = "usb-c-connector";
++				label = "USB-C";
++
++				port {
++					typec_ep: endpoint {
++						remote-endpoint = <&dwc3_ep>;
++					};
++				};
++			};
++		};
++	};
++};
++
++&ommanager {
++	memory-region = <&mm_ospi1>;
++	memory-region-names = "mm_ospi1";
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&ospi_port1_clk_pins_a
++		     &ospi_port1_io03_pins_a
++		     &ospi_port1_cs0_pins_a>;
++	pinctrl-1 = <&ospi_port1_clk_sleep_pins_a
++		     &ospi_port1_io03_sleep_pins_a
++		     &ospi_port1_cs0_sleep_pins_a>;
++	status = "okay";
++
++	spi@40430000 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		memory-region = <&mm_ospi1>;
++		status = "okay";
++
++		flash0: flash@0 {
++			compatible = "jedec,spi-nor";
++			vmmc-supply = <&scmi_v1v8>;
++			vqmmc-supply = <&scmi_vddio3>;
++			reg = <0>;
++			spi-rx-bus-width = <4>;
++			spi-tx-bus-width = <4>;
++			spi-max-frequency = <84000000>;
++		};
++	};
++};
++
++&rtc {
++	#clock-cells = <0>;
++	st,lsco = <RTC_OUT2_RMP>;
++	pinctrl-0 = <&rtc_out2_rmp_pins_a>;
++	pinctrl-names = "default";
++	status = "okay";
++};
++
++&scmi_regu {
++	scmi_vddio1: regulator@0 {
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <3300000>;
++	};
++	scmi_vddcore: regulator@b {
++		reg = <VOLTD_SCMI_STPMIC2_BUCK2>;
++		regulator-name = "vddcore";
++	};
++	scmi_v1v8: regulator@e {
++		reg = <VOLTD_SCMI_STPMIC2_BUCK5>;
++		regulator-name = "v1v8";
++	};
++	scmi_v3v3: regulator@10 {
++		reg = <VOLTD_SCMI_STPMIC2_BUCK7>;
++		regulator-name = "v3v3";
++	};
++	scmi_vdd_emmc: regulator@12 {
++		reg = <VOLTD_SCMI_STPMIC2_LDO2>;
++		regulator-name = "vdd_emmc";
++	};
++	scmi_vdd3v3_usb: regulator@14 {
++		reg = <VOLTD_SCMI_STPMIC2_LDO4>;
++		regulator-name = "vdd3v3_usb";
++	};
++	scmi_v5v_hdmi: regulator@15 {
++		reg = <VOLTD_SCMI_STPMIC2_LDO5>;
++		regulator-name = "v5v_hdmi";
++	};
++	scmi_vdd_io: regulator@16 {
++		reg = <VOLTD_SCMI_STPMIC2_LDO6>;
++		regulator-name = "vdd_io";
++	};
++	scmi_vddio_sdcard: regulator@17 {
++		reg = <VOLTD_SCMI_STPMIC2_LDO7>;
++		regulator-name = "vddio_sdcard";
++	};
++};
++
++&sdmmc1 {
++	pinctrl-names = "default", "opendrain", "sleep";
++	pinctrl-0 = <&sdmmc1_b4_pins_b>;
++	pinctrl-1 = <&sdmmc1_b4_od_pins_b>;
++	pinctrl-2 = <&sdmmc1_b4_sleep_pins_a>;
++	cd-gpios = <&gpiod 9 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
++	disable-wp;
++	st,neg-edge;
++	bus-width = <4>;
++	#vmmc-supply = <&scmi_v3v3>;
++	#vqmmc-supply = <&scmi_vddio_sdcard>;
++	vmmc-supply = <&scmi_v3v3>;
++	vqmmc-supply = <&scmi_vddio1>;
++	sd-uhs-sdr12;
++	sd-uhs-sdr25;
++	sd-uhs-sdr50;
++	sd-uhs-ddr50;
++	sd-uhs-sdr104;
++	status = "okay";
++};
++
++&sdmmc2 {
++	pinctrl-names = "default", "opendrain", "sleep";
++	pinctrl-0 = <&sdmmc2_b4_pins_a &sdmmc2_d47_pins_a>;
++	pinctrl-1 = <&sdmmc2_b4_od_pins_a &sdmmc2_d47_pins_a>;
++	pinctrl-2 = <&sdmmc2_b4_sleep_pins_a &sdmmc2_d47_sleep_pins_a>;
++	non-removable;
++	no-sd;
++	no-sdio;
++	st,neg-edge;
++	bus-width = <8>;
++	vmmc-supply = <&scmi_vdd_emmc>;
++	vqmmc-supply = <&scmi_vddio2>;
++	mmc-ddr-1_8v;
++	mmc-hs200-1_8v;
++	status = "okay";
++};
++
++#ifdef USE_PANEL_BACKLIGHT
++&timers5 {
++	status = "okay";
++	pwm5: pwm {
++		pinctrl-0 = <&pwm5_ch2_pins_a>;
++		pinctrl-1 = <&pwm5_ch2_sleep_pins_a>;
++		pinctrl-names = "default", "sleep";
++		status = "okay";
++	};
++};
++#endif
++
++#ifdef USE_UART_B
++&usart1 {
++	pinctrl-names = "default", "sleep", "idle";
++	pinctrl-0 = <&usart1_pins_a>;
++	pinctrl-1 = <&usart1_sleep_pins_a>;
++	pinctrl-2 = <&usart1_idle_pins_a>;
++	uart-has-rtscts;
++	status = "okay";
++};
++#endif
++
++&uart5 {
++	bootph-all;
++	pinctrl-names = "default", "idle", "sleep";
++	pinctrl-0 = <&uart5_pins_a>;
++	pinctrl-1 = <&uart5_idle_pins_a>;
++	pinctrl-2 = <&uart5_sleep_pins_a>;
++	/delete-property/dmas;
++	/delete-property/dma-names;
++	status = "okay";
++};
++
++&uart5_pins_a {
++	bootph-all;
++	pins1 {
++		bootph-all;
++	};
++	pins2 {
++		bootph-all;
++	};
++};
++
++#ifdef USE_UART_A
++&uart9 {
++	pinctrl-names = "default", "idle", "sleep";
++	pinctrl-0 = <&uart9_pins_a>;
++	pinctrl-1 = <&uart9_idle_pins_a>;
++	pinctrl-2 = <&uart9_sleep_pins_a>;
++	/delete-property/dmas;
++	/delete-property/dma-names;
++	status = "okay";
++};
++#endif
++
++&usb2_phy1 {
++	vdd33-supply = <&scmi_vdd3v3_usb>;
++	status = "okay";
++};
++
++&usb2_phy2 {
++	vdd33-supply = <&scmi_vdd3v3_usb>;
++	status = "okay";
++};
++
++&usbh {
++	status = "okay";
++
++	usbh_ehci: usb@482f0000 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		/* onboard HUB */
++		hub@1 {
++			compatible = "usb424,2514";
++			reg = <1>;
++			vdd-supply = <&scmi_v3v3>;
++		};
++	};
++
++	usbh_ohci: usb@482e0000 {
++		status = "disabled";
++	};
++};
++
++&usb3dr {
++	status = "okay";
++
++	dwc3: usb@48300000 {
++		phys            = <&usb2_phy2>, <&combophy PHY_TYPE_USB3>;
++		phy-names       = "usb2-phy", "usb3-phy";
++		usb-role-switch;
++		port {
++			dwc3_ep: endpoint {
++				remote-endpoint = <&typec_ep>;
++			};
++		};
++	};
++};
+diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
+index a0a1225f6ff3..4f2dfe6db529 100644
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -793,6 +793,71 @@ static const struct panel_desc ampire_am_480272h3tmqw_t01h = {
+ 	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+ };
+ 
++
++/*
++ * This setting works fine for the Ampire AM800480R2 display
++ * connected to the DS90CF386 LVDS Receiver
++ */
++static const struct drm_display_mode ampire_am800480r2_ds90cf386_mode = {
++#if 1
++	/* setting for ampire_am800480r2 rgb display */
++	.clock = 71143,
++	//.clock = 35414,
++	.hdisplay = 800,
++	.hsync_start = 800 + 168,
++	.hsync_end = 800 + 168 + 64,
++	.htotal = 800 + 168 + 64 + 88,
++	.vdisplay = 480,
++	.vsync_start = 480 + 37,
++	.vsync_end = 480 + 37 + 2,
++	.vtotal = 480 + 37 + 2 + 8,
++	.flags = DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC,
++#else
++	/* setting for ampire_am800480r2 rgb display */
++	.clock = 71143,
++	.hdisplay = 800,
++	.hsync_start = 800 + 0,
++	.hsync_end = 800 + 1,
++	.htotal = 800 + 0 + 1 + 160,
++	.vdisplay = 480,
++	.vsync_start = 480 + 0,
++	.vsync_end = 480 + 48 + 1,
++	.vtotal = 480 + 48 + 1 + 0,
++	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
++#endif
++};
++
++static const struct panel_desc ampire_am800480r2_ds90cf386 = {
++#if 0
++	/* setting for ampire_am800480r2 rgb display */
++	.modes = &ampire_am800480r2_ds90cf386_mode,
++	.num_modes = 1,
++	.bpc = 6,
++	.size = {
++		.width = 152,
++		.height = 91,
++	},
++	.bus_format = MEDIA_BUS_FMT_RGB666_1X18,
++#else
++	.modes = &ampire_am800480r2_ds90cf386_mode,
++	.num_modes = 1,
++	.bpc = 8,
++	.size = {
++		.width = 152,
++		.height = 91,
++	},
++
++	.delay = {
++		.enable = 200,
++		.unprepare = 200,
++		.disable = 400,
++	},
++	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
++	.connector_type = DRM_MODE_CONNECTOR_LVDS,
++	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
++#endif
++};
++
+ static const struct drm_display_mode ampire_am800480r3tmqwa1h_mode = {
+ 	.clock = 33333,
+ 	.hdisplay = 800,
+-- 
+2.34.1
+
