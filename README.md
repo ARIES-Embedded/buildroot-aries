@@ -4,11 +4,12 @@ Here you will find support for the ARIES Emedded System on Modules
 (SoMs) and Evaluation Kits (EVKs) for [Buildroot][1]. We use an [external
 buildroot tree][2] to maintain the ARIES Embedded specific parts.
 
-The following EVKs are supported:
+The following EVKs and EVPs are supported:
 
  * MCVEVK and [MCVEVP][3]
  * [MA5D4EVK][4]
  * [MSMP1EVK][5]
+ * [MSMP2EVK][6]
 
 You can build an embedded Linux distribution with Buildroot as shown
 below. The example is for the MCVEVP. For other EVKs just substitue the
@@ -22,13 +23,13 @@ official buildroot repository:
 
         $ git clone https://github.com/ARIES-Embedded/buildroot-aries.git
 
-        $ git clone --branch 2023.02.x git://git.buildroot.net/buildroot.git
+For the MSMP2EVK, please use:
 
-If the maintenance branch `2023.02.x` is not yet available, please use:
+        $ git clone --branch st/2025.02.12 https://github.com/bootlin/buildroot.git
 
-        $ git clone git://git.buildroot.net/buildroot.git
-        $ cd buildroot
-        $ git checkout -b aries-2023.02 2023.02
+and for all other boards please use:
+
+        $ git clone --branch 2023.02.x https://gitlab.com/buildroot.org/buildroot.git
 
 For the MSMP1EVK, you also need to apply some temporary patches for th ARM
 Trusted Firmware and U-Boot boot loader:
@@ -66,3 +67,4 @@ once after copying the SDK to the new location:
 [3]: board/mcvevk/readme.md
 [4]: board/ma5d4evk/readme.txt
 [5]: board/msmp1evk/readme.md
+[6]: board/msmp2evk/readme.md
