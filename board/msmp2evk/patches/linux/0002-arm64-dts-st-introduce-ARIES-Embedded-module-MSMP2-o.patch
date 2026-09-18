@@ -1,4 +1,4 @@
-From 2b2d37ff57028698a5dc6e7bcb5e2c58a7ca15dc Mon Sep 17 00:00:00 2001
+From b4a0e68b47957682d4c8b9a1e53ad11cdbbc1b17 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Mon, 24 Aug 2026 10:10:30 +0200
 Subject: [PATCH 2/2] arm64: dts: st: introduce ARIES Embedded module MSMP2 on
@@ -9,9 +9,9 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  arch/arm64/boot/dts/st/Makefile               |   1 +
  arch/arm64/boot/dts/st/stm32mp25-pinctrl.dtsi | 113 ++-
  .../dts/st/stm32mp255d-msmp2evk-resmem.dtsi   | 195 +++++
- .../boot/dts/st/stm32mp255d-msmp2evk.dts      | 743 ++++++++++++++++++
+ .../boot/dts/st/stm32mp255d-msmp2evk.dts      | 739 ++++++++++++++++++
  drivers/gpu/drm/panel/panel-simple.c          |  65 ++
- 5 files changed, 1115 insertions(+), 2 deletions(-)
+ 5 files changed, 1111 insertions(+), 2 deletions(-)
  create mode 100644 arch/arm64/boot/dts/st/stm32mp255d-msmp2evk-resmem.dtsi
  create mode 100644 arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts
 
@@ -375,10 +375,10 @@ index 000000000000..2a93d5ed87cd
 +};
 diff --git a/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts b/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts
 new file mode 100644
-index 000000000000..d3be6324678e
+index 000000000000..4a6f251460a0
 --- /dev/null
 +++ b/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts
-@@ -0,0 +1,743 @@
+@@ -0,0 +1,739 @@
 +// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
 +/*
 + * Copyright (C) STMicroelectronics 2023 - All Rights Reserved
@@ -674,11 +674,7 @@ index 000000000000..d3be6324678e
 +		#size-cells = <0>;
 +		compatible = "snps,dwmac-mdio";
 +		phy1_eth1: ethernet-phy@7 {
-+			compatible = "ethernet-phy-id001c.c916";
-+			//reset-gpios =  <&gpioa 2 GPIO_ACTIVE_LOW>;
-+			reset-assert-us = <10000>;
-+			reset-deassert-us = <80000>;
-+			realtek,eee-disable;
++			compatible = "ethernet-phy-ieee802.3-c22";
 +			reg = <7>;
 +		};
 +	};
