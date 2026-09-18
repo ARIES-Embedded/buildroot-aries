@@ -1,4 +1,4 @@
-ARIES Embedded module MSMP2 on Evaluation Kit MSMP2EVK
+ARIES Embedded module MSMP2 on the Evaluation Kit MSMP2EVK
 ========================================================================
 
 Introduction
@@ -18,7 +18,6 @@ Currently, the folloiwng hardware options and configs are supported:
     
     MSMP255D-BBA: STM32MP255D, STPMIC25B, 1 GB LPDDR4
                   stm32mp255d-msmp2evk_defconfig
-                  stm32mp255d-msmp2evk-qt5_defconfig
     
 
 SPI-NOR and SDcard/eMMC Layout
@@ -52,7 +51,7 @@ The following files are generated in the `images` sub-directory:
 
       tf-a-stm32mp255d-msmp2evk.stm32  # Arm Trusted Firmware image
 
-- For partition "fip":
+- For partition "fip1 or fip2":
 
       fip.img                          # FIP image
 
@@ -72,6 +71,13 @@ The following files are generated in the `images` sub-directory:
 
       spi-nor.img                      # overall Boot-loader image
 
+- Images to boot from USB-OTG:
+
+      fip-ddr-stm32mp255d-msmp2evk_usb.bin
+      fip-stm32mp255d-msmp2evk_usb.bin
+      tf-a-stm32mp255d-msmp2evk_usb.stm32
+
+
 
 Create a bootable microSD card
 ------------------------------
@@ -87,7 +93,7 @@ You may need to adapt the name of the output device.
 Boot from the microSD card
 --------------------------
 
-NOTE: Booting from the microSD is not yet supported!
+*NOTE*: Booting from the microSD is not yet supported!
 
 1. Power-down the board
 
@@ -178,7 +184,7 @@ in U-Boot by using `=> ums 0 mmc 1` or `=> mmc write ...`.
 Boot from the eMMC
 ------------------
 
-NOTE: Currently only this boot mode is supported
+*NOTE*: Currently only this boot mode is supported
 
 1. Power-down the board
 

@@ -27,7 +27,7 @@ For the MSMP2EVK, please use:
 
         $ git clone --branch st/2025.02.12 https://github.com/bootlin/buildroot.git
 
-and for all other boards please use:
+and for all other boards use:
 
         $ git clone --branch 2023.02.x https://gitlab.com/buildroot.org/buildroot.git
 
