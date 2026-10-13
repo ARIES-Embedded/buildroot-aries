@@ -1,8 +1,8 @@
-From 3c95c61659bda1932a0bee93ce99c2c6b51fba6e Mon Sep 17 00:00:00 2001
+From f88c11727fa70a2dbbeb31b90d7349a7d7a7c77f Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Thu, 20 Aug 2026 09:55:06 +0200
-Subject: [PATCH] fdts: stm32mp2: introduce ARIES Embedded module MSMP2 module
- on the EVK
+Subject: [PATCH 2/2] fdts: stm32mp2: introduce ARIES Embedded module MSMP2
+ module on the EVK
 
 Add support for the module MSMP2 on the Evaluation Kit (EVK) from
 ARIES Embedded. The MSMP2 is based on ST's STM32MP255D MPU and
@@ -25,7 +25,7 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
 
 diff --git a/fdts/stm32mp25-lpddr4-1x8Gbits-1x32bits-1200MHz.dtsi b/fdts/stm32mp25-lpddr4-1x8Gbits-1x32bits-1200MHz.dtsi
 new file mode 100644
-index 000000000..42798e5b9
+index 000000000..67d8a47eb
 --- /dev/null
 +++ b/fdts/stm32mp25-lpddr4-1x8Gbits-1x32bits-1200MHz.dtsi
 @@ -0,0 +1,241 @@
@@ -219,7 +219,7 @@ index 000000000..42798e5b9
 +#define DDR_UIM_MR4_0 0x00000000
 +#define DDR_UIM_MR5_0 0x00000000
 +#define DDR_UIM_MR6_0 0x00000000
-+#define DDR_UIM_MR11_0 0x00000066
++#define DDR_UIM_MR11_0 0x00000065
 +#define DDR_UIM_MR12_0 0x00000047
 +#define DDR_UIM_MR13_0 0x00000008
 +#define DDR_UIM_MR14_0 0x00000047
