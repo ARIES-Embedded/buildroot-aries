@@ -1,4 +1,4 @@
-From f88c11727fa70a2dbbeb31b90d7349a7d7a7c77f Mon Sep 17 00:00:00 2001
+From 1a9f474146c73ce9cab20df0a2deeb9ecea801fc Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Thu, 20 Aug 2026 09:55:06 +0200
 Subject: [PATCH 2/2] fdts: stm32mp2: introduce ARIES Embedded module MSMP2
@@ -15,8 +15,8 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  ...32mp255d-msmp2evk-ca35tdcid-fw-config.dtsi |  34 +++
  fdts/stm32mp255d-msmp2evk-ca35tdcid-rcc.dtsi  |  96 +++++++
  fdts/stm32mp255d-msmp2evk-fw-config.dts       |   7 +
- fdts/stm32mp255d-msmp2evk.dts                 | 211 +++++++++++++++
- 6 files changed, 603 insertions(+)
+ fdts/stm32mp255d-msmp2evk.dts                 | 232 +++++++++++++++++
+ 6 files changed, 624 insertions(+)
  create mode 100644 fdts/stm32mp25-lpddr4-1x8Gbits-1x32bits-1200MHz.dtsi
  create mode 100644 fdts/stm32mp255d-msmp2evk-ca35tdcid-fw-config.dtsi
  create mode 100644 fdts/stm32mp255d-msmp2evk-ca35tdcid-rcc.dtsi
@@ -450,10 +450,10 @@ index 000000000..2de0b140f
 +#include "stm32mp255d-msmp2evk-ca35tdcid-fw-config.dtsi"
 diff --git a/fdts/stm32mp255d-msmp2evk.dts b/fdts/stm32mp255d-msmp2evk.dts
 new file mode 100644
-index 000000000..bd9ebf68d
+index 000000000..01d0896fa
 --- /dev/null
 +++ b/fdts/stm32mp255d-msmp2evk.dts
-@@ -0,0 +1,211 @@
+@@ -0,0 +1,232 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 +/*
 + * Copyright (C) STMicroelectronics 2021 - All Rights Reserved
@@ -612,6 +612,27 @@ index 000000000..bd9ebf68d
 +&iwdg1 {
 +	timeout-sec = <32>;
 +	status = "okay";
++};
++
++&ommanager {
++	pinctrl-names = "default";
++	pinctrl-0 = <&ospi_port1_clk_pins_a
++		     &ospi_port1_io03_pins_a
++		     &ospi_port1_cs0_pins_a>;
++	status = "okay";
++
++	spi@40430000 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		status = "okay";
++
++		flash0: flash@0 {
++			compatible = "jedec,spi-nor";
++			reg = <0>;
++			spi-rx-bus-width = <4>;
++			spi-max-frequency = <133000000>;
++		};
++	};
 +};
 +
 +&pwr {
