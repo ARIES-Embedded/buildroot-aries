@@ -1,17 +1,16 @@
-From b4a0e68b47957682d4c8b9a1e53ad11cdbbc1b17 Mon Sep 17 00:00:00 2001
+From 304cfb8eaf538ae9268c327629651fbcf2f5cf6c Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Mon, 24 Aug 2026 10:10:30 +0200
-Subject: [PATCH 2/2] arm64: dts: st: introduce ARIES Embedded module MSMP2 on
- EVK
+Subject: [PATCH] arm64: dts: st: introduce ARIES Embedded module MSMP2 on EVK
 
 Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
 ---
  arch/arm64/boot/dts/st/Makefile               |   1 +
  arch/arm64/boot/dts/st/stm32mp25-pinctrl.dtsi | 113 ++-
  .../dts/st/stm32mp255d-msmp2evk-resmem.dtsi   | 195 +++++
- .../boot/dts/st/stm32mp255d-msmp2evk.dts      | 739 ++++++++++++++++++
+ .../boot/dts/st/stm32mp255d-msmp2evk.dts      | 748 ++++++++++++++++++
  drivers/gpu/drm/panel/panel-simple.c          |  65 ++
- 5 files changed, 1111 insertions(+), 2 deletions(-)
+ 5 files changed, 1120 insertions(+), 2 deletions(-)
  create mode 100644 arch/arm64/boot/dts/st/stm32mp255d-msmp2evk-resmem.dtsi
  create mode 100644 arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts
 
@@ -375,10 +374,10 @@ index 000000000000..2a93d5ed87cd
 +};
 diff --git a/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts b/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts
 new file mode 100644
-index 000000000000..4a6f251460a0
+index 000000000000..d0621481af7d
 --- /dev/null
 +++ b/arch/arm64/boot/dts/st/stm32mp255d-msmp2evk.dts
-@@ -0,0 +1,739 @@
+@@ -0,0 +1,748 @@
 +// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
 +/*
 + * Copyright (C) STMicroelectronics 2023 - All Rights Reserved
@@ -436,6 +435,17 @@ index 000000000000..4a6f251460a0
 +		};
 +	};
 +
++	vdd_sd: regulator-vdd-sd {
++		compatible = "regulator-fixed";
++		regulator-name = "vdd-sd";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		gpio = <&gpiod 11 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		startup-delay-us = <10000>;
++		regulator-boot-on;
++	};
++
 +#ifdef USE_CAMERA
 +	imx219_vana_2v8: 2p8v {
 +		compatible = "regulator-fixed";
@@ -491,7 +501,7 @@ index 000000000000..4a6f251460a0
 +#endif
 +		power-supply = <&scmi_v3v3>;
 +		status = "okay";
-+	
++
 +		width-mm = <155>;
 +		height-mm = <93>;
 +		data-mapping = "jeida-24";
@@ -748,7 +758,7 @@ index 000000000000..4a6f251460a0
 +			};
 +		};
 +	};
-+#endif		
++#endif
 +};
 +
 +&i2c2 {
@@ -942,7 +952,7 @@ index 000000000000..4a6f251460a0
 +
 +&scmi_regu {
 +	scmi_vddio1: regulator@0 {
-+		regulator-min-microvolt = <1800000>;
++		regulator-min-microvolt = <3300000>;
 +		regulator-max-microvolt = <3300000>;
 +	};
 +	scmi_vddcore: regulator@b {
@@ -973,10 +983,10 @@ index 000000000000..4a6f251460a0
 +		reg = <VOLTD_SCMI_STPMIC2_LDO6>;
 +		regulator-name = "vdd_io";
 +	};
-+	scmi_vddio_sdcard: regulator@17 {
-+		reg = <VOLTD_SCMI_STPMIC2_LDO7>;
-+		regulator-name = "vddio_sdcard";
-+	};
++	//scmi_vddio_sdcard: regulator@17 {
++	//	reg = <VOLTD_SCMI_STPMIC2_LDO7>;
++	//	regulator-name = "vddio_sdcard";
++	//};
 +};
 +
 +&sdmmc1 {
@@ -988,9 +998,7 @@ index 000000000000..4a6f251460a0
 +	disable-wp;
 +	st,neg-edge;
 +	bus-width = <4>;
-+	#vmmc-supply = <&scmi_v3v3>;
-+	#vqmmc-supply = <&scmi_vddio_sdcard>;
-+	vmmc-supply = <&scmi_v3v3>;
++	vmmc-supply = <&vdd_sd>;
 +	vqmmc-supply = <&scmi_vddio1>;
 +	sd-uhs-sdr12;
 +	sd-uhs-sdr25;
