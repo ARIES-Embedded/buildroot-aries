@@ -1,4 +1,4 @@
-From f10b840cdb9896e830890c34cda8688a30853f50 Mon Sep 17 00:00:00 2001
+From e198b0a2e6ca3123f69fc46ef6b265bf095f4742 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Thu, 20 Aug 2026 10:22:03 +0200
 Subject: [PATCH] platform: stm32mp2: introduce ARIES Embedded module MSMP2 on
@@ -10,10 +10,10 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  .../stm32mp255d-msmp2evk-ca35tdcid-rcc.dtsi   |  198 ++++
  ...stm32mp255d-msmp2evk-ca35tdcid-resmem.dtsi |  147 +++
  .../stm32mp255d-msmp2evk-ca35tdcid-rif.dtsi   | 1040 +++++++++++++++++
- core/arch/arm/dts/stm32mp255d-msmp2evk.dts    |  485 ++++++++
+ core/arch/arm/dts/stm32mp255d-msmp2evk.dts    |  487 ++++++++
  core/arch/arm/plat-stm32mp2/conf.mk           |    4 +-
  .../drivers/stm32mp25_pwr_regul.c             |    2 +
- 7 files changed, 1888 insertions(+), 1 deletion(-)
+ 7 files changed, 1890 insertions(+), 1 deletion(-)
  create mode 100644 core/arch/arm/dts/stm32mp255d-msmp2evk-ca35tdcid-rcc.dtsi
  create mode 100644 core/arch/arm/dts/stm32mp255d-msmp2evk-ca35tdcid-resmem.dtsi
  create mode 100644 core/arch/arm/dts/stm32mp255d-msmp2evk-ca35tdcid-rif.dtsi
@@ -1446,10 +1446,10 @@ index 000000000..bb11db511
 +
 diff --git a/core/arch/arm/dts/stm32mp255d-msmp2evk.dts b/core/arch/arm/dts/stm32mp255d-msmp2evk.dts
 new file mode 100644
-index 000000000..550863fcb
+index 000000000..9c97f6938
 --- /dev/null
 +++ b/core/arch/arm/dts/stm32mp255d-msmp2evk.dts
-@@ -0,0 +1,485 @@
+@@ -0,0 +1,487 @@
 +// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
 +/*
 + * Copyright (C) STMicroelectronics 2023 - All Rights Reserved
@@ -1765,6 +1765,7 @@ index 000000000..550863fcb
 +				regulator-max-microvolt = <3300000>;
 +				regulator-over-current-protection;
 +				st,regulator-bypass-microvolt = <3300000>;
++				regulator-always-on;
 +				st,pwrctrl-sel = <3>;
 +				st,pwrctrl-reset;
 +			};
@@ -1806,9 +1807,10 @@ index 000000000..550863fcb
 +
 +	vddio1: vddio1 {
 +		status = "okay";
-+		regulator-min-microvolt = <1800000>;
++		regulator-min-microvolt = <3300000>;
 +		regulator-max-microvolt = <3300000>;
 +		vddio1-supply = <&vddio_sdcard>;
++		regulator-always-on;
 +	};
 +
 +	vddio2: vddio2 {
