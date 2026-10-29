@@ -5,8 +5,11 @@ Introduction
 ------------
 
 This README describes how to build and install the firmware for the
-ARIES Embedded System on Module (SoM) [MSMP2][1] and the Evaluation Kit
+ARIES Embedded System on Module (SoM) [MSMP2][1] on the Evaluation Kit
 (EVK) MSMP2EVK.
+
+This Buildroot BSP follows closely the [STM32MPU Buildroot external tree][2].
+
 
 Build
 -----
@@ -14,33 +17,42 @@ Build
 How to build the BSP images is described in the [README.md][3] file in the
 top directory of this repository.
 
-Currently, the folloiwng hardware options and configs are supported:
+Currently, the folloiwng hardware options and Buildroot configs are
+supported:
     
     MSMP255D-BBA: STM32MP255D, STPMIC25B, 1 GB LPDDR4
                   stm32mp255d-msmp2evk_defconfig
+                  stm32mp255d-msmp2evk-qt5_defconfig
     
 
 SPI-NOR and SDcard/eMMC Layout
 ------------------------------
 
-The layout is defined by `genimage.cfg`. The SPI-NOR is partitioned
-as show below:
+For the SD card, eMMC and the SPI-NOR, images with minimal footprint for
+the boot-loaders are generated. A more sophisticated and robust firmware
+update mechanism as per the PSA FW update specification could be selected
+as well but requires changes to the BSP. See [Firmware Update (FWU)][4].
+The `demo` configs of [STM32MPU Buildroot external tree][2] actually use
+it.
+
+The layout is defined by `genimage.cfg`. The SPI-NOR is partitioned as
+show below:
 
       Offset   Size  Image
-    0x000000   256K  fsbl1
-    0x040000   256K  fsbl2
-    0x080000     4M  fip1
-    0x480000     4M  fip2
+    0x000000   256K  fsbla1
+    0x040000   256K  fsbla2
+    0x080000     4M  fip
     0x900000    64K  u-boot-env1
     0x940000    64K  u-boot-env2
     0x980000   6.5M  user-defined
 
-And for the eMMC the following partitions are created:
+And for the SD card and the eMMC the following partitions are created:
 
     Number  Start (sector)    End (sector)  Size Name
-         1             512            8703 4096K fip
-         2            8704            8735 16384 u-boot-env
-         3            8736          213535  100M rootfs
+         1              34             545  256K fsbla
+         2             546            8737 4096K fip
+         3            8738            8769 16384 u-boot-env
+         4            8770          213569  100M rootfs
 
 Images
 ------
@@ -69,7 +81,7 @@ The following files are generated in the `images` sub-directory:
 
 - Image for the SPI-NOR:
 
-      spi-nor.img                      # overall Boot-loader image
+      nor.img                          # overall Boot-loader image
 
 - Images to boot from USB-OTG:
 
@@ -78,14 +90,14 @@ The following files are generated in the `images` sub-directory:
       tf-a-stm32mp255d-msmp2evk_usb.stm32
 
 
-
 Create a bootable microSD card
 ------------------------------
 
 On your host, copy the file `sdcard.img` onto a microSD card with
 `dd`:
 
-    $ sudo dd if=output/images/sdcard.img of=/dev/mmcblk0 bs=512
+    $ sudo dd if=images/sdcard.img of=/dev/mmcblk0 bs=512
+    $ sync
 
 You may need to adapt the name of the output device.
 
@@ -93,13 +105,11 @@ You may need to adapt the name of the output device.
 Boot from the microSD card
 --------------------------
 
-*NOTE*: Booting from the microSD is not yet supported!
-
 1. Power-down the board
 
-2. Select the boot mode `101` to boot from the eMMC on the EVK board:
+2. Select the boot mode `001` to boot from the eMMC on the EVK board:
 
-       BOOT SW3: OFF
+       BOOT SW3: ON
        BOOT SW2: ON
        BOOT SW1: OFF
 
@@ -121,24 +131,20 @@ Boot from the microSD card
     => setenv ethaddr c0:e5:4e:bc:18:6b
     => saveenv
 
-8. You can login into `root` without password.
+8. You can login into `root` without password or with "root" if a
+   password is required.
 
 9. The Linux device-tree used at boot is defined in `extlinux.conf`:
 
-       # cat /boot/extlinux/extlinux.conf
-       label stm32mp255d-msmp2evk-buildroot
-         kernel /boot/zImage
-         devicetree /boot/stm32mp255d-msmp2evk.dtb
-       #  devicetree /boot/stm32mp255d-msmp2evk-rgb-panel.dtb
-         append root=/dev/mmcblk0p4 rootwait
-
-   If you have an RGP panel attached, please modify that file
-   using `devicetree /boot/stm32mp255d-msmp2evk-rgb-panel.dtb`.
+    # cat /boot/extlinux/extlinux.conf
+    label stm32mp255d-msmp2evk-buildroot
+      kernel /boot/Image.gz
+      devicetree /boot/stm32mp255d-msmp2evk.dtb
+      append root=PARTUUID=b26967be-18fb-40fe-9d9b-ae035fc4a1c5 rootwait console=ttySTM0,115200n8 earlycon clk_ignore_unused
 
 
 Create a bootable eMMC
 ----------------------
-
 
 This is a bit more tricky, as the Arm Trusted Firmware image has to be
 copied into the first boot section of the eMMC. To do so, we boot from
@@ -161,7 +167,7 @@ Furthermore you may need to set a password for root with `# passwd` to
 get `scp` to work.
 
 Finally we write the images to `mmc1` on the target and enable boot
-fro the eMMC with:
+for the eMMC with:
 
     # dd if=/tmp/sdcard.img of=/dev/mmcblk1 bs=512
     # sync
@@ -178,7 +184,9 @@ fro the eMMC with:
     # mmc bootpart enable 1 1 /dev/mmcblk1
 
 There are various other methods to update the firmware in the eMMC. e.g.
-in U-Boot by using `=> ums 0 mmc 1` or `=> mmc write ...`.
+in U-Boot by using `=> ums 0 mmc 1` or `=> mmc write ...`. You can also
+use the [STM32CubeProgrammer][5] as described below under "Boot from
+USB-OTG".
 
 
 Boot from the eMMC
@@ -188,7 +196,7 @@ Boot from the eMMC
 
 1. Power-down the board
 
-2. Select the boot mode `010` to boot from the eMMC on the EVK board:
+2. Select the boot mode `100` to boot from the eMMC on the EVK board:
 
        BOOT SW3: ON
        BOOT SW2: OFF
@@ -201,20 +209,59 @@ Boot from the eMMC
 Create a bootable SPI-NOR flash
 -------------------------------
 
-Not yet supported
+The boot-loader (Arm-Trusted-Firmware + U-Boot) can also be installed
+to and booted from the SPI-NOR flash:
+
+- Update from Linux:
+
+  Copy the following files from the `images` directory to the target, e.g.
+  by using `scp` on the host:
+
+      $ scp tf-a-stm32mp157a-msmp1evk.stm32 fip.bin  nor.img root@192.168.0.13:/tmp/
+
+  Then write these on the target to the SPI-NOR flash:
+
+      # flashcp /tmp/tf-a-stm32mp157a-msmp1evk.stm32 /dev/mtd0
+      # flashcp /tmp/tf-a-stm32mp157a-msmp1evk.stm32 /dev/mtd1
+      # flashcp /tmp/fip.bin /dev/mtd2
+
+  or if you booted from the SDcard/eMMC
+
+      # flashcp /tmp/nor.img /dev/mtd0
+
+- Update from U-Boot:
+
+      STM32MP> tftp ${loadaddr} msmp1evk/nor.img
+      STM32MP> sf probe
+      STM32MP> sf erase 0 +${filesize}
+      STM32MP> sf write ${loadaddr} 0 ${filesize}
+
+- Update via USB-OTG:
+
+  You can also use the STM32CubeProgrammer as described below under
+  "Boot from USB-OTG".
 
 
 Boot from the SPI-NOR
 ---------------------
 
-Not yet supported
+1. Power-down the board
+
+2. Select the boot mode `100` to boot from the SPI-NOR of the EVK board:
+
+       BOOT SW3: OFF
+       BOOT SW2: ON
+       BOOT SW1: ON
+
+3. Then follow the instructions listed above for "Boot from the
+   microSD card" starting at item 4.
 
 
 Boot from USB-OTG
 -----------------
 
 For board bring-up or debugging purposes is is handy to load and start
-the bootloader via USB-OTG by using the STM32CubeProgrammer [4] on the
+the boot-loader via USB-OTG by using the [STM32CubeProgrammer][5] on the
 host.
 
 For that purpose, you have to add `STM32MP_USB_PROGRAMMER=1`to the
@@ -222,8 +269,8 @@ Buildroot config `BR2_TARGET_ARM_TRUSTED_FIRMWARE_ADDITIONAL_VARIABLES`
 manually. But with that config, Linux does not boot any more. ST is
 aware of that limitation and want to fix it sooner than later.
 
-For your convenience, there are pre-built bootloader images with the
-suffix `_usb` and a flash loader script avaliable in the `images`
+For your convenience, there are pre-built boot-loader images with the
+suffix `_usb` and a flash loader script available in the `images`
 directory:
 
         - tf-a-stm32mp255d-msmp2evk_usb.stm32
@@ -233,17 +280,17 @@ directory:
 
 1. Power-down the board
 
-2. Select the boot mode `111` to boot from USB-OTG of the EVK board:
+2. Select the boot mode `000` to boot from USB-OTG of the EVK board:
 
-       BOOT SW3: OFF
-       BOOT SW2: OFF
-       BOOT SW1: OFF
+       BOOT SW3: ON
+       BOOT SW2: ON
+       BOOT SW1: ON
 
 3. Connect the Debug-Console and the USB-OTG to your host.
 
 4. Power-on the board and execute the following command on your host:
 
-        $ cat images/flash.tsv 
+        $ cat flash.tsv
         #opt    Id      Name            Type            Device  Offset          Binary
         -       0x01    fsbl_boot       Binary          none    0x0             tf-a-stm32mp255d-msmp2evk_usb.stm32
         -       0x02    fip_ddr         Binary          none    0x0             fip-ddr-stm32mp255d-msmp2evk_usb.bin
@@ -251,18 +298,19 @@ directory:
         P       0x04    fsbl_boot1      Binary          mmc1    boot1           tf-a-stm32mp255d-msmp2evk.stm32
         P       0x05    fsbl_boot2      Binary          mmc1    boot2           tf-a-stm32mp255d-msmp2evk.stm32
         P       0x10    sdcard          RawImage        mmc1    0x0             sdcard.img
+        P       0x20    nor             RawImage        nor1    0x0             nor.img
 
 	$ <path>/STM32_Programmer_CLI -c port=USB1 -w flash.tsv
 
 You should see the system booting on the Debug-Console. Then the primary
-bootloader image will be written to the first and second boot partition
-of the eMMC (mmc1) and finally `sdcard.img`. The change the boot switches
-to boto from the eMMC.
-
-5. Then follow the instructions listed above for "Boot from the
-   microSD card" starting at item 4.
+boot-loader image will be written to the first and second boot partition
+of the eMMC (mmc1) followed by `sdcard.img`. Finally the image `nor.img`
+will be written to the SPI-NOR. Then change the boot switches to boot
+from the eMMC or SPI-NOR.
 
 
 [1]: https://www.aries-embedded.com/system-on-module/cpu/stmp255-stmicro-cortexa35-msmp2-osm-ethernet-can-ai
+[2]: https://github.com/bootlin/buildroot-external-st#stm32mpu-buildroot-external-tree
 [3]: ../../README.md
-[4]: https://www.st.com/en/development-tools/stm32cubeprog.html
+[4]: https://trustedfirmware-a.readthedocs.io/en/lts-v2.10.35/components/firmware-update.html
+[5]: https://www.st.com/en/development-tools/stm32cubeprog.html
