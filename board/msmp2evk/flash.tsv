@@ -5,3 +5,4 @@
 P	0x04	fsbl_boot1	Binary		mmc1	boot1		%ATFMMCBIN%
 P	0x05	fsbl_boot2	Binary		mmc1	boot2		%ATFMMCBIN%
 P	0x10	sdcard		RawImage	mmc1	0x0		sdcard.img
+P	0x20	nor		RawImage	nor1	0x0		nor.img
