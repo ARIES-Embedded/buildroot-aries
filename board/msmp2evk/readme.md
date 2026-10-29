@@ -128,19 +128,19 @@ Boot from the microSD card
    SDcard/eMMC. Therefore you need to re-set the MAC address of the
    Ethernet interface once at the U-Boot prompt:
 
-    => setenv ethaddr c0:e5:4e:bc:18:6b
-    => saveenv
+       => setenv ethaddr c0:e5:4e:bc:18:6b
+       => saveenv
 
 8. You can login into `root` without password or with "root" if a
    password is required.
 
 9. The Linux device-tree used at boot is defined in `extlinux.conf`:
 
-    # cat /boot/extlinux/extlinux.conf
-    label stm32mp255d-msmp2evk-buildroot
-      kernel /boot/Image.gz
-      devicetree /boot/stm32mp255d-msmp2evk.dtb
-      append root=PARTUUID=b26967be-18fb-40fe-9d9b-ae035fc4a1c5 rootwait console=ttySTM0,115200n8 earlycon clk_ignore_unused
+       # cat /boot/extlinux/extlinux.conf
+       label stm32mp255d-msmp2evk-buildroot
+         kernel /boot/Image.gz
+         devicetree /boot/stm32mp255d-msmp2evk.dtb
+         append root=PARTUUID=b26967be-18fb-40fe-9d9b-ae035fc4a1c5 rootwait console=ttySTM0,115200n8 earlycon clk_ignore_unused
 
 
 Create a bootable eMMC
@@ -196,7 +196,7 @@ Boot from the eMMC
 
 1. Power-down the board
 
-2. Select the boot mode `100` to boot from the eMMC on the EVK board:
+2. Select the boot mode `010` to boot from the eMMC on the EVK board:
 
        BOOT SW3: ON
        BOOT SW2: OFF
