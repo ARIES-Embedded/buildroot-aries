@@ -1,4 +1,4 @@
-From d28fd71c7f49727e8f7c0eb8d41a15400d53f7ff Mon Sep 17 00:00:00 2001
+From effa6b429e22fe2c32fd57e663203bff1c1c55f5 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Thu, 20 Aug 2026 11:15:07 +0200
 Subject: [PATCH] arm: dts: stm32: introduce ARIES Embedded module MSMP2 on EVK
@@ -9,11 +9,11 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  arch/arm/dts/stm32mp25-pinctrl.dtsi           |  61 ++
  arch/arm/dts/stm32mp255d-msmp2evk-resmem.dtsi | 195 +++++
  arch/arm/dts/stm32mp255d-msmp2evk-u-boot.dtsi |  37 +
- arch/arm/dts/stm32mp255d-msmp2evk.dts         | 706 ++++++++++++++++++
+ arch/arm/dts/stm32mp255d-msmp2evk.dts         | 705 ++++++++++++++++++
  board/st/stm32mp2/stm32mp2.c                  |  92 ++-
  configs/stm32mp255d-msmp2evk_defconfig        | 200 +++++
  drivers/video/stm32/stm32_lvds.c              |   3 +-
- 8 files changed, 1286 insertions(+), 9 deletions(-)
+ 8 files changed, 1285 insertions(+), 9 deletions(-)
  create mode 100644 arch/arm/dts/stm32mp255d-msmp2evk-resmem.dtsi
  create mode 100644 arch/arm/dts/stm32mp255d-msmp2evk-u-boot.dtsi
  create mode 100644 arch/arm/dts/stm32mp255d-msmp2evk.dts
@@ -363,10 +363,10 @@ index 00000000000..a0484b53e57
 +};
 diff --git a/arch/arm/dts/stm32mp255d-msmp2evk.dts b/arch/arm/dts/stm32mp255d-msmp2evk.dts
 new file mode 100644
-index 00000000000..ad4898ac7be
+index 00000000000..7477bce169e
 --- /dev/null
 +++ b/arch/arm/dts/stm32mp255d-msmp2evk.dts
-@@ -0,0 +1,706 @@
+@@ -0,0 +1,705 @@
 +// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
 +/*
 + * Copyright (C) STMicroelectronics 2023 - All Rights Reserved
@@ -474,16 +474,15 @@ index 00000000000..ad4898ac7be
 +		data-mapping = "jeida-24";
 +
 +		panel-timing {
-+			#clock-frequency = <71142857>;
-+			clock-frequency = <30502140>;
++			clock-frequency = <33264000>;
 +			hactive = <800>;
-+			hfront-porch = <0>;
-+			hsync-len = <1>;
-+			hback-porch = <160>;
++			hfront-porch = <40>;
++			hsync-len = <128>;
++			hback-porch = <88>; /* 40 + 128 + 88 = 256 -> Htotal = 1056 (typ) */
 +			vactive = <480>;
-+			vfront-porch = <0>;
-+			vsync-len = <49>;
-+			vback-porch = <0>;
++			vfront-porch = <10>;
++			vsync-len = <3>;
++			vback-porch = <32>; /* 10 + 3 + 32 = 45 -> Vtotal = 525 (typ) */
 +		};
 +
 +		port {
