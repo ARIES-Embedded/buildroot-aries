@@ -290,17 +290,16 @@ directory:
 
 4. Power-on the board and execute the following command on your host:
 
-        $ cat flash.tsv
-        #opt    Id      Name            Type            Device  Offset          Binary
-        -       0x01    fsbl_boot       Binary          none    0x0             tf-a-stm32mp255d-msmp2evk_usb.stm32
-        -       0x02    fip_ddr         Binary          none    0x0             fip-ddr-stm32mp255d-msmp2evk_usb.bin
-        -       0x03    fip_boot        Binary          none    0x0             fip-stm32mp255d-msmp2evk_usb.bin
-        P       0x04    fsbl_boot1      Binary          mmc1    boot1           tf-a-stm32mp255d-msmp2evk.stm32
-        P       0x05    fsbl_boot2      Binary          mmc1    boot2           tf-a-stm32mp255d-msmp2evk.stm32
-        P       0x10    sdcard          RawImage        mmc1    0x0             sdcard.img
-        P       0x20    nor             RawImage        nor1    0x0             nor.img
-
-	$ <path>/STM32_Programmer_CLI -c port=USB1 -w flash.tsv
+       $ cat flash.tsv
+       #opt    Id      Name            Type            Device  Offset          Binary
+       -       0x01    fsbl_boot       Binary          none    0x0             tf-a-stm32mp255d-msmp2evk_usb.stm32
+       -       0x02    fip_ddr         Binary          none    0x0             fip-ddr-stm32mp255d-msmp2evk_usb.bin
+       -       0x03    fip_boot        Binary          none    0x0             fip-stm32mp255d-msmp2evk_usb.bin
+       P       0x04    fsbl_boot1      Binary          mmc1    boot1           tf-a-stm32mp255d-msmp2evk.stm32
+       P       0x05    fsbl_boot2      Binary          mmc1    boot2           tf-a-stm32mp255d-msmp2evk.stm32
+       P       0x10    sdcard          RawImage        mmc1    0x0             sdcard.img
+       P       0x20    nor             RawImage        nor1    0x0             nor.img
+       $ <path>/STM32_Programmer_CLI -c port=USB1 -w flash.tsv
 
 You should see the system booting on the Debug-Console. Then the primary
 boot-loader image will be written to the first and second boot partition
