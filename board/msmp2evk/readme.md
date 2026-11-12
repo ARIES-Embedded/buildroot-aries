@@ -107,7 +107,7 @@ Boot from the microSD card
 
 1. Power-down the board
 
-2. Select the boot mode `001` to boot from the eMMC on the EVK board:
+2. Select the boot mode `001` to boot from the microSD card on the EVK board:
 
        BOOT SW3: ON
        BOOT SW2: ON
