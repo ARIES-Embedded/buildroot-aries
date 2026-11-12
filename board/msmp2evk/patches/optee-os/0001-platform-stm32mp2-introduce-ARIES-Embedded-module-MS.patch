@@ -1,4 +1,4 @@
-From e198b0a2e6ca3123f69fc46ef6b265bf095f4742 Mon Sep 17 00:00:00 2001
+From 310ea64cb7aba828ad98525149a65e5896ac5ad8 Mon Sep 17 00:00:00 2001
 From: Wolfgang Grandegger <wg@aries-embedded.de>
 Date: Thu, 20 Aug 2026 10:22:03 +0200
 Subject: [PATCH] platform: stm32mp2: introduce ARIES Embedded module MSMP2 on
@@ -12,8 +12,8 @@ Signed-off-by: Wolfgang Grandegger <wg@aries-embedded.de>
  .../stm32mp255d-msmp2evk-ca35tdcid-rif.dtsi   | 1040 +++++++++++++++++
  core/arch/arm/dts/stm32mp255d-msmp2evk.dts    |  487 ++++++++
  core/arch/arm/plat-stm32mp2/conf.mk           |    4 +-
- .../drivers/stm32mp25_pwr_regul.c             |    2 +
- 7 files changed, 1890 insertions(+), 1 deletion(-)
+ .../drivers/stm32mp25_pwr_regul.c             |    7 +
+ 7 files changed, 1895 insertions(+), 1 deletion(-)
  create mode 100644 core/arch/arm/dts/stm32mp255d-msmp2evk-ca35tdcid-rcc.dtsi
  create mode 100644 core/arch/arm/dts/stm32mp255d-msmp2evk-ca35tdcid-resmem.dtsi
  create mode 100644 core/arch/arm/dts/stm32mp255d-msmp2evk-ca35tdcid-rif.dtsi
@@ -1955,16 +1955,21 @@ index 5801e2f78..742499cb8 100644
  flavorlist-MP23 = $(flavor_dts_file-235F_DK)
  
 diff --git a/core/arch/arm/plat-stm32mp2/drivers/stm32mp25_pwr_regul.c b/core/arch/arm/plat-stm32mp2/drivers/stm32mp25_pwr_regul.c
-index e705a6b68..62f30033c 100644
+index e705a6b68..1119e1294 100644
 --- a/core/arch/arm/plat-stm32mp2/drivers/stm32mp25_pwr_regul.c
 +++ b/core/arch/arm/plat-stm32mp2/drivers/stm32mp25_pwr_regul.c
-@@ -264,7 +264,9 @@ static TEE_Result pwr_set_low_volt(struct regulator *regulator, bool state)
+@@ -264,7 +264,14 @@ static TEE_Result pwr_set_low_volt(struct regulator *regulator, bool state)
  			if (!(io_read32(reg) & pwr_regu->vrsel_mask)) {
  				EMSG("%s: set VRSEL failed",
  				     regulator_name(regulator));
-+				/* FIXME: ignore the error on the MSMP2
++#if 1
++				/* The MSMP2 uses the STPMIC25B, which provides
++				 * 1.8V for VDDIO and VDDIO2. It the Fuse OTP124
++				 * Bit #13 and #17 is not set, the system will
++				 * panic here.
++				 */
  				panic();
-+				*/
++#endif
  			}
  		} else {
  			io_clrbits32(reg, pwr_regu->vrsel_mask);
